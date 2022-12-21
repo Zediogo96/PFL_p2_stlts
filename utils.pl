@@ -46,6 +46,7 @@ validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
      write('Error: move cannot be diagonal.'), nl,
      fail).
 
+
 %---------------------------------------------------------------------------%
 
 

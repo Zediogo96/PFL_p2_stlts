@@ -21,5 +21,57 @@ move_board_element(StartRow, StartColumn, EndRow, EndColumn) :-
     change_board(StartRow, StartColumn, ' '),
     change_board(EndRow, EndColumn, BoardElement).
 
+% ------------------------ BOUNDARIES CHECK ------------------------
+
+check_col_range(StartColumn, EndColumn, Row) :-
+    StartColumn < EndColumn,
+    is_column_range_clear_smaller(StartColumn, EndColumn, Row);
+    StartColumn > EndColumn,
+    is_column_range_clear_greater(StartColumn, EndColumn, Row).
+
+is_column_range_clear_smaller(StartColumn, EndColumn, Row) :-
+    Stop is EndColumn - 1,
+    StartColumn =:= Stop;
+    StartColumn1 is StartColumn + 1,
+    board_element(Row, StartColumn1, BoardElement),
+    write('-'), write(BoardElement), nl,
+    BoardElement = ' ',
+    is_column_range_clear_smaller(StartColumn1, EndColumn, Row).
+
+is_column_range_clear_greater(StartColumn, EndColumn, Row) :-
+    Stop is EndColumn + 1,
+    StartColumn =:= Stop;
+    StartColumn1 is StartColumn - 1,
+    board_element(Row, StartColumn1, BoardElement),
+    write('-'), write(BoardElement), nl,
+    BoardElement = ' ',
+    is_column_range_clear_greater(StartColumn1, EndColumn, Row).
+
+check_row_range(StartRow, EndRow, Column) :-
+    StartRow < EndRow,
+    is_row_range_clear_smaller(StartRow, EndRow, Column);
+    StartRow > EndRow,
+    is_row_range_clear_greater(StartRow, EndRow, Column).
+
+is_row_range_clear_smaller(StartRow, EndRow, Column) :-
+    Stop is EndRow - 1,
+    StartRow =:= Stop;
+    StartRow1 is StartRow + 1,
+    board_element(StartRow1, Column, BoardElement),
+    BoardElement = ' ',
+    is_row_range_clear_smaller(StartRow1, EndRow, Column).
+
+is_row_range_clear_greater(StartRow, EndRow, Column) :-
+    Stop is EndRow + 1,
+    StartRow =:= Stop;
+    StartRow1 is StartRow - 1,
+    board_element(StartRow1, Column, BoardElement),
+    BoardElement = ' ',
+    is_row_range_clear_greater(StartRow1, EndRow, Column).
+
+% ------------------------ END BOUNDARIES CHECK ------------------------
+    
+
+
 
 
