@@ -48,11 +48,19 @@ validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
 
 %---------------------------------------------------------------------------%
 
-% PARSER FUNCTIONS
 
-% Parses the char input (horizontal coordinates) to a number (index)
-letter_to_number(Letter, Number) :-
-    char_code(Letter, Code),
-    Number is Code - 96.
+atomic_list_concat(Atom,Separator,Res) :- atom_chars(Atom,CAtom),
+                                          atomic_list_concat_(CAtom,Separator,List),
+                                          maplist(atom_chars,Res,List).
+
+atomic_list_concat_([],_,[[]]) :- ! .
+
+atomic_list_concat_([A|As],Sep,[[]|Args]) :- A = Sep,
+                                             atomic_list_concat_(As,Sep,Args).
+
+atomic_list_concat_([A|As],Sep,[[A|Arg]|Args]) :- A\=Sep,
+                                                  atomic_list_concat_(As,Sep,[Arg|Args]).
+
+
 
 
