@@ -31,7 +31,11 @@ validate_indices(_, _, _, EndColumn) :-
     write('Error: invalid end column index. End column index must be between 1 and 12.'), nl,
     fail.
 
+
 %---------------------------------------------------------------------------%
+
+% GAME LOGIC VALIDATION
+
 validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
     (StartRow = EndRow, StartColumn = EndColumn ->
      write('Error: start position and end position are the same. Move must be to a different position.'), nl,
@@ -41,4 +45,14 @@ validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
      true ;
      write('Error: move cannot be diagonal.'), nl,
      fail).
-    
+
+%---------------------------------------------------------------------------%
+
+% PARSER FUNCTIONS
+
+% Parses the char input (horizontal coordinates) to a number (index)
+letter_to_number(Letter, Number) :-
+    char_code(Letter, Code),
+    Number is Code - 96.
+
+

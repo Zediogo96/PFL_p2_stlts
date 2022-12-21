@@ -16,6 +16,10 @@ replace_at_index(Index, List, Value, NewList) :-
 
 move_board_element(StartRow, StartColumn, EndRow, EndColumn) :-
     validate_indices(StartRow, StartColumn, EndRow, EndColumn),
+    validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn),
     board_element(StartRow, StartColumn, BoardElement),
     change_board(StartRow, StartColumn, ' '),
     change_board(EndRow, EndColumn, BoardElement).
+
+
+
