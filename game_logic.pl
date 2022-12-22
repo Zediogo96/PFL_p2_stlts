@@ -56,18 +56,18 @@ is_column_range_clear_greater(StartColumn, EndColumn, Row) :-
 
 
 check_row_range(StartRow, EndRow, Column) :-
-    
-    StartRow < EndRow,
-    is_row_range_clear_smaller(StartRow, EndRow, Column);
-    StartRow > EndRow,
-    is_row_range_clear_greater(StartRow, EndRow, Column).
+    SR is 13 - StartRow, ER is 13 - EndRow,
+    SR < ER,
+    is_row_range_clear_smaller(SR, ER, Column);
+    SR > ER,
+    is_row_range_clear_greater(SR, ER, Column).
 
 is_row_range_clear_smaller(StartRow, EndRow, Column) :-
     Stop is EndRow - 1,
     StartRow =:= Stop;
     StartRow1 is StartRow + 1,
     board_element(StartRow1, Column, BoardElement),
-    BoardElement = ' ',
+    BoardElement = board_piece(_, _, ' ', _, _),
     is_row_range_clear_smaller(StartRow1, EndRow, Column).
 
 is_row_range_clear_greater(StartRow, EndRow, Column) :-
@@ -75,7 +75,7 @@ is_row_range_clear_greater(StartRow, EndRow, Column) :-
     StartRow =:= Stop;
     StartRow1 is StartRow - 1,
     board_element(StartRow1, Column, BoardElement),
-    BoardElement = ' ',
+    BoardElement = board_piece(_, _, ' ', _, _),
     is_row_range_clear_greater(StartRow1, EndRow, Column).
 
 % ------------------------ END BOUNDARIES CHECK ------------------------
