@@ -29,6 +29,23 @@ move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)),
     replace_board_piece(ToRowNum, ToColumnNum, BoardPiece).
 
+
+% ------------------------ UPDATE PINS -----------------------------
+
+increment_white_pin(RowNum, ColumnNum) :-
+    get_board_piece(RowNum, ColumnNum, BoardPiece),
+    BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
+    Type \= ' ', % VALIDATE IF POSITION IS NOT EMPTY
+    NewNumWhitePins is NumWhitePins + 1,
+    replace_board_piece(RowNum, ColumnNum, board_piece(RowNum, ColumnNum, Type, NewNumWhitePins, NumBlackPins)).
+
+increment_black_pin(RowNum, ColumnNum) :-
+    get_board_piece(RowNum, ColumnNum, BoardPiece),
+    BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
+    Type \= ' ', % VALIDATE IF POSITION IS NOT EMPTY
+    NewNumBlackPins is NumBlackPins + 1,
+    replace_board_piece(RowNum, ColumnNum, board_piece(RowNum, ColumnNum, Type, NumWhitePins, NewNumBlackPins)).
+
 % ------------------------ BOUNDARIES CHECK ------------------------
 
 check_col_range(StartColumn, EndColumn, Row) :-
