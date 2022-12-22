@@ -2,10 +2,13 @@
 :- use_module(library(lists)).
 
 % Consults
+:- consult('frontend.pl').
+:- consult('data.pl').
 :- consult('menu.pl').
 :- consult('game_data.pl').
 :- consult('game_logic.pl').
 :- consult('utils.pl').
+
 
 read_codes(Stream, []) :-
     at_end_of_stream(Stream).
