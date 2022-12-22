@@ -32,30 +32,31 @@ move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
 % ------------------------ BOUNDARIES CHECK ------------------------
 
 check_col_range(StartColumn, EndColumn, Row) :-
+    R is 13 - Row,
     StartColumn < EndColumn,
-    is_column_range_clear_smaller(StartColumn, EndColumn, Row);
+    is_column_range_clear_smaller(StartColumn, EndColumn, R);
     StartColumn > EndColumn,
-    is_column_range_clear_greater(StartColumn, EndColumn, Row).
+    is_column_range_clear_greater(StartColumn, EndColumn, R).
 
 is_column_range_clear_smaller(StartColumn, EndColumn, Row) :-
     Stop is EndColumn - 1,
     StartColumn =:= Stop;
     StartColumn1 is StartColumn + 1,
-    board_element(Row, StartColumn1, BoardElement),
-    write('-'), write(BoardElement), nl,
-    BoardElement = ' ',
+    get_board_piece(Row, StartColumn1, BoardElement),
+    BoardElement = board_piece(_, _, ' ', _, _),
     is_column_range_clear_smaller(StartColumn1, EndColumn, Row).
 
 is_column_range_clear_greater(StartColumn, EndColumn, Row) :-
     Stop is EndColumn + 1,
     StartColumn =:= Stop;
     StartColumn1 is StartColumn - 1,
-    board_element(Row, StartColumn1, BoardElement),
-    write('-'), write(BoardElement), nl,
-    BoardElement = ' ',
+    get_board_piece(Row, StartColumn1, BoardElement),
+    BoardElement = board_piece(_, _, ' ', _, _),
     is_column_range_clear_greater(StartColumn1, EndColumn, Row).
 
+
 check_row_range(StartRow, EndRow, Column) :-
+    
     StartRow < EndRow,
     is_row_range_clear_smaller(StartRow, EndRow, Column);
     StartRow > EndRow,
