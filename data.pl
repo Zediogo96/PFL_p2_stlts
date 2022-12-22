@@ -1,4 +1,5 @@
-:- dynamic initial_board/2.
+:- dynamic initial_board/1.
+:- dynamic board_piece/5.
 
 board_piece(RowNumber, ColumnNumber, Type, Whitepins, Blackpins) :-
     member(Type, ['E', 'W', 'B']),

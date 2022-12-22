@@ -1,25 +1,33 @@
-% board_element(+RowNumber, +ColumnNumber, ?BoardElement)
-board_element(RowNumber, ColumnNumber, BoardElement) :-
-    initial_board(RowNumber, Row),
-    nth1(ColumnNumber, Row, BoardElement).
+% get_board_piece(+GameState, +RowNum, +ColumnNum, -BoardPiece)
+get_board_piece(RowNum, ColumnNum, BoardPiece) :-
+    initial_board(Board),
+    RowNum1 is 13 - RowNum,
+    nth1(RowNum1, Board, Row),
+    nth1(ColumnNum, Row, BoardPiece).
 
-change_board(Row, Column, Value) :-
-    retract(initial_board(Row, List)),
-    replace_at_index(Column, List, Value, NewList),
-    assertz(initial_board(Row, NewList)).
+% replace_board_piece(+RowNum, +ColumnNum, +NewBoardPiece)
+replace_board_piece(RowNum, ColumnNum, NewBoardPiece) :-
+    initial_board(GameState),
+    RowN1 is 13 - RowNum,
+    nth1(RowN1, GameState, Row),
+    replace_at_index(Row, ColumnNum, NewBoardPiece, NewRow),
+    replace_at_index(GameState, RowN1, NewRow, NewGameState),
+    retract(initial_board(GameState)),
+    assertz(initial_board(NewGameState)).
 
-replace_at_index(Index, List, Value, NewList) :-
+% replace_at_index(+List, +Index, +Value, -NewList)
+replace_at_index(List, Index, Value, NewList) :-
     Index1 is Index - 1,
     length(Before, Index1),
     append(Before, [_|After], List),
     append(Before, [Value|After], NewList).
 
-move_board_element(StartRow, StartColumn, EndRow, EndColumn) :-
-    validate_indices(StartRow, StartColumn, EndRow, EndColumn),
-    validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn),
-    board_element(StartRow, StartColumn, BoardElement),
-    change_board(StartRow, StartColumn, ' '),
-    change_board(EndRow, EndColumn, BoardElement).
+% move_board_piece(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+    initial_board(GameState),
+    get_board_piece(FromRowNum, FromColumnNum, BoardPiece),
+    replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)),
+    replace_board_piece(ToRowNum, ToColumnNum, BoardPiece).
 
 % ------------------------ BOUNDARIES CHECK ------------------------
 
