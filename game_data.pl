@@ -164,19 +164,23 @@ initial_board(
               board_piece(1, 11, ' ', 0, 0),
               board_piece(1, 12, ' ', 0, 0)]
               ]).
-              
-reset_board(Board) :-
-    retract(initial_board(_)), % remove the current definition of initial_board/1
-    assert(initial_board(Board)). % re-assert the initial board state
+
+
+% current_board(-Board)
+% assert the initial board state into the database
+:- initialization(initialize_current_board).
+
+initialize_current_board :-
+    % call the initial_board/1 predicate to get the initial board state
+    initial_board(Board),
+    % create a copy of the initial board state
+    copy_term(Board, InitialBoardCopy),
+    % assert the initial board copy into the database
+    asserta(current_board(InitialBoardCopy)).
 
 % initial_state(-GameState-Player)
 initial_state(GameState-Player) :-
-    initial_board(Board), % fetch the initial board state
+    current_board(Board), % fetch the initial board state
     GameState = Board, % assign the initial board state to GameState
     Player = human.
-
-% initial_state(+Size, -GameState)
-initial_state(Size, GameState) :-
-    initial_board(Board), % fetch the initial board state
-    GameState = Board. % assign the initial board state to GameState
                

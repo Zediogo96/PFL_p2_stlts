@@ -1,5 +1,11 @@
 % get_board_piece(+GameState, +RowNum, +ColumnNum, -BoardPiece)
 get_board_piece(RowNum, ColumnNum, BoardPiece) :-
+    current_board(Board),
+    RowNum1 is 13 - RowNum,
+    nth1(RowNum1, Board, Row),
+    nth1(ColumnNum, Row, BoardPiece).
+
+get_board_piece_(RowNum, ColumnNum, BoardPiece) :-
     initial_board(Board),
     RowNum1 is 13 - RowNum,
     nth1(RowNum1, Board, Row),
@@ -7,13 +13,18 @@ get_board_piece(RowNum, ColumnNum, BoardPiece) :-
 
 % replace_board_piece(+RowNum, +ColumnNum, +NewBoardPiece)
 replace_board_piece(RowNum, ColumnNum, NewBoardPiece) :-
-    initial_board(GameState),
+    current_board(Board),
+    % adjust the row number to be in the range 1 to 8
     RowN1 is 13 - RowNum,
-    nth1(RowN1, GameState, Row),
+    % get the row at the specified index
+    nth1(RowN1, Board, Row),
+    % replace the element at the specified column in the row
     replace_at_index(Row, ColumnNum, NewBoardPiece, NewRow),
-    replace_at_index(GameState, RowN1, NewRow, NewGameState),
-    retract(initial_board(GameState)),
-    assertz(initial_board(NewGameState)).
+    % replace the row in the board
+    replace_at_index(Board, RowN1, NewRow, NewBoard),
+    % update the current_board predicate
+    retract(current_board(Board)),
+    asserta(current_board(NewBoard)).
 
 % replace_at_index(+List, +Index, +Value, -NewList)
 replace_at_index(List, Index, Value, NewList) :-
@@ -24,7 +35,6 @@ replace_at_index(List, Index, Value, NewList) :-
 
 % move_board_piece(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
 move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
-    initial_board(GameState),
     get_board_piece(FromRowNum, FromColumnNum, BoardPiece),
     replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)),
     replace_board_piece(ToRowNum, ToColumnNum, BoardPiece).
