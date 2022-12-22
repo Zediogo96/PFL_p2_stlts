@@ -3,7 +3,6 @@
 
 % Consults
 :- consult('frontend.pl').
-:- consult('data.pl').
 :- consult('menu.pl').
 :- consult('game_data.pl').
 :- consult('game_logic.pl').

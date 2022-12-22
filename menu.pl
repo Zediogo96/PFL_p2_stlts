@@ -1,6 +1,8 @@
 play :-
     initial_state(GameState-Player),
     display_game(GameState-Player).
+
+
     
 
 instructions :-

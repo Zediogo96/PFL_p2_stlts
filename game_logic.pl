@@ -39,7 +39,6 @@ move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)),
     replace_board_piece(ToRowNum, ToColumnNum, BoardPiece).
 
-
 % ------------------------ UPDATE PINS -----------------------------
 
 increment_white_pin(RowNum, ColumnNum) :-
@@ -140,5 +139,4 @@ validate_indices(_, _, _, EndColumn) :-
 
 % ------------------------ END BOUNDARIES CHECK ------------------------
 
-% move
 
