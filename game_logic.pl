@@ -139,4 +139,9 @@ validate_indices(_, _, _, EndColumn) :-
 
 % ------------------------ END BOUNDARIES CHECK ------------------------
 
-
+% game_over(+Board, +Player, -Winner)
+game_over(Board, Player, Winner) :-
+    % count the number of board pieces with type 'B' and type 'W' in the board
+    count_board_pieces(Board, 0, 0, BCount, WCount),
+    % check if either player has no more board pieces
+    (BCount = 0 -> Winner = Player2; WCount = 0 -> Winner = Player1; Winner = 'None').
