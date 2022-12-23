@@ -35,9 +35,23 @@ replace_at_index(List, Index, Value, NewList) :-
 
 % move_board_piece(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
 move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
-    get_board_piece(FromRowNum, FromColumnNum, BoardPiece),
-    replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)),
-    replace_board_piece(ToRowNum, ToColumnNum, BoardPiece).
+    validate_movement_inputs(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum), % combines validate_indices/4 and validate_not_diagonal/4
+    once(move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)). % use once/1 to prevent backtracking
+
+% move_board_piece_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+    get_board_piece(FromRowNum, FromColumnNum, BoardPiece), % get the board piece at the starting position
+    (   FromRowNum == ToRowNum, FromColumnNum \== ToColumnNum % horizontal move
+    ->  check_col_range(FromColumnNum, ToColumnNum, FromRowNum),
+        check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
+        replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
+        replace_board_piece(ToRowNum, ToColumnNum, BoardPiece) % place the board piece at the ending position
+    ;   FromColumnNum == ToColumnNum, FromRowNum \== ToRowNum % vertical move
+    ->  check_row_range(FromRowNum, ToRowNum, FromColumnNum),
+        check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
+        replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
+        replace_board_piece(ToRowNum, ToColumnNum, BoardPiece) % place the board piece at the ending position
+    ).
 
 % ------------------------ UPDATE PINS -----------------------------
 
@@ -57,53 +71,97 @@ increment_black_pin(RowNum, ColumnNum) :-
 
 % ------------------------ BOUNDARIES CHECK ------------------------
 
+% check_col_range(+StartColumn, +EndColumn, +Row)
 check_col_range(StartColumn, EndColumn, Row) :-
-    R is 13 - Row,
-    StartColumn < EndColumn,
-    is_column_range_clear_smaller(StartColumn, EndColumn, R);
-    StartColumn > EndColumn,
-    is_column_range_clear_greater(StartColumn, EndColumn, R).
+    (   StartColumn < EndColumn
+    ->  is_column_range_clear_smaller(StartColumn, EndColumn, Row)
+    ;   StartColumn > EndColumn,
+        is_column_range_clear_greater(StartColumn, EndColumn, Row)
+    ).
 
+% is_column_range_clear_smaller(+StartColumn, +EndColumn, +Row)
 is_column_range_clear_smaller(StartColumn, EndColumn, Row) :-
     Stop is EndColumn - 1,
-    StartColumn =:= Stop;
-    StartColumn1 is StartColumn + 1,
-    get_board_piece(Row, StartColumn1, BoardElement),
-    BoardElement = board_piece(_, _, ' ', _, _),
-    is_column_range_clear_smaller(StartColumn1, EndColumn, Row).
+    (   StartColumn =:= Stop
+    ->  true
+    ;   StartColumn1 is StartColumn + 1,
+        get_board_piece(Row, StartColumn1, BoardElement),
+        (   BoardElement = board_piece(_, _, ' ', _, _)
+        ->  is_column_range_clear_smaller(StartColumn1, EndColumn, Row)
+        ;   write('Error: encountered a non-empty board piece in column range'), nl,
+            fail, cut % use cut/0 to prevent backtracking and repeating the recursive calls
+        )
+    ).
 
+% is_column_range_clear_greater(+StartColumn, +EndColumn, +Row)
 is_column_range_clear_greater(StartColumn, EndColumn, Row) :-
     Stop is EndColumn + 1,
-    StartColumn =:= Stop;
-    StartColumn1 is StartColumn - 1,
-    get_board_piece(Row, StartColumn1, BoardElement),
-    BoardElement = board_piece(_, _, ' ', _, _),
-    is_column_range_clear_greater(StartColumn1, EndColumn, Row).
+    (   StartColumn =:= Stop
+    ->  true
+    ;   StartColumn1 is StartColumn - 1,
+        get_board_piece(Row, StartColumn1, BoardElement),
+        (   BoardElement = board_piece(_, _, ' ', _, _)
+        ->  is_column_range_clear_greater(StartColumn1, EndColumn, Row)
+        ;   write('Error: encountered a non-empty board piece in column range'), nl,
+            fail, cut % use cut/0 to prevent backtracking and repeating the recursive calls
+        )
+    ).
 
+% check_row_range(+StartRow, +EndRow, +Column)
 check_row_range(StartRow, EndRow, Column) :-
-    SR is 13 - StartRow, ER is 13 - EndRow,
-    SR < ER,
-    is_row_range_clear_smaller(SR, ER, Column);
-    SR > ER,
-    is_row_range_clear_greater(SR, ER, Column).
+    SR is 13 - StartRow, ER is 13 - EndRow, % flip the rows so they are in ascending order
+    (   SR < ER
+    ->  is_row_range_clear_smaller(SR, ER, Column)
+    ;   SR > ER,
+        is_row_range_clear_greater(SR, ER, Column)
+    ).
 
+% is_row_range_clear_smaller(+StartRow, +EndRow, +Column)
 is_row_range_clear_smaller(StartRow, EndRow, Column) :-
     Stop is EndRow - 1,
-    StartRow =:= Stop;
-    StartRow1 is StartRow + 1,
-    board_element(StartRow1, Column, BoardElement),
-    BoardElement = board_piece(_, _, ' ', _, _),
-    is_row_range_clear_smaller(StartRow1, EndRow, Column).
+    (   StartRow =:= Stop
+    ->  true
+    ;   StartRow1 is StartRow + 1,
+        get_board_piece(StartRow1, Column, BoardElement), % use get_board_piece/3 instead of board_element/3
+        (   BoardElement = board_piece(_, _, ' ', _, _)
+        ->  is_row_range_clear_smaller(StartRow1, EndRow, Column)
+        ;   write('Error: encountered a non-empty board piece in row range'), nl,
+            cut % use cut/0 to prevent backtracking and repeating the recursive calls
+        )
+    ).
 
+% is_row_range_clear_greater(+StartRow, +EndRow, +Column)
 is_row_range_clear_greater(StartRow, EndRow, Column) :-
     Stop is EndRow + 1,
-    StartRow =:= Stop;
-    StartRow1 is StartRow - 1,
-    board_element(StartRow1, Column, BoardElement),
-    BoardElement = board_piece(_, _, ' ', _, _),
-    is_row_range_clear_greater(StartRow1, EndRow, Column).
+    (   StartRow =:= Stop
+    ->  true
+    ;   StartRow1 is StartRow - 1,
+        get_board_piece(StartRow1, Column, BoardElement), % use get_board_piece/3 instead of board_element/3
+        (   BoardElement = board_piece(_, _, ' ', _, _)
+        ->  is_row_range_clear_greater(StartRow1, EndRow, Column)
+        ;   write('Error: encountered a non-empty board piece in row range'), nl,
+            fail, cut % use cut/0 to prevent backtracking and repeating the recursive calls
+        )
+    ).
+
+% check_same_type(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+    get_board_piece(FromRowNum, FromColumnNum, FromBoardPiece),
+    get_board_piece(ToRowNum, ToColumnNum, ToBoardPiece),
+    write(FromBoardPiece), write('<---->'), write(ToBoardPiece), nl,
+    (   FromBoardPiece = board_piece(_, _, FromType, _, _),
+        ToBoardPiece = board_piece(_, _, ToType, _, _),
+        FromType = ToType
+    ->  write('Error: cannot move a piece to a position with a piece of the same type'), nl,
+        fail, cut
+    ;   true
+    ).
 
 % ------------------------ VALIDATE MOVE ------------------------
+
+validate_movement_inputs(StartRow, StartColumn, EndRow, EndColumn) :-
+    validate_indices(StartRow, StartColumn, EndRow, EndColumn),
+    validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn).
 
 validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
     (StartRow = EndRow, StartColumn = EndColumn ->

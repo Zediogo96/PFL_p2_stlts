@@ -182,5 +182,5 @@ initialize_current_board :-
 initial_state(GameState-Player) :-
     current_board(Board), % fetch the initial board state
     GameState = Board, % assign the initial board state to GameState
-    Player = human.
+    Player = player1.
                
