@@ -6,7 +6,7 @@ get_board_piece(RowNum, ColumnNum, BoardPiece) :-
     nth1(ColumnNum, Row, BoardPiece).
 
 get_board_piece_(RowNum, ColumnNum, BoardPiece) :-
-    initial_board(Board),
+    current_board(Board),
     RowNum1 is 13 - RowNum,
     nth1(RowNum1, Board, Row),
     nth1(ColumnNum, Row, BoardPiece).

@@ -183,4 +183,16 @@ initial_state(GameState-Player) :-
     current_board(Board), % fetch the initial board state
     GameState = Board, % assign the initial board state to GameState
     Player = player1.
+
+% revert_board
+% update the current board with the initial board state
+revert_board :-
+    % fetch the initial board state
+    initial_board(Board),
+    % fetch the current board state
+    current_board(CurrentBoard),
+    % remove the current board state from the database
+    retract(current_board(CurrentBoard)),
+    % add the initial board state to the database
+    asserta(current_board(Board)).
                
