@@ -85,10 +85,11 @@ manage_piece(Piece) :-
     Piece = board_piece(PieceRN, PieceCN, Type, _, _),
     (Type \= ' ' -> 
     % display the menu of options
+    nl,
     write('1. Increment white pin'), nl,
     write('2. Increment black pin'), nl,
     write('3. Move'), nl,
-    write('4. Back to get_valid_row_column_input'), nl,
+    write('4. Back to Select Piece'), nl,
     % get option input from the user
     write('Enter option: '),
     read(Option),
@@ -117,3 +118,29 @@ manage_piece(Piece) :-
      write('Error: the selected piece is empty.'), nl,
      nl, fail).
 
+% get_valid_row_column_input(-Row, -Column)
+get_valid_row_column_input(Row, Column) :-
+    repeat,
+    % get row input from the user
+    write('Choose your Piece: '), nl,
+    write('   -- Enter row number: '),
+    read(InputRow),
+    % check if the input is a valid row index
+    (is_between(1, 12, InputRow) ->
+     Row = InputRow,
+     % get column input from the user
+     write('   -- Enter column number: '),
+     read(InputColumn),
+     % check if the input is a valid column index
+     (is_between(1, 12, InputColumn) ->
+      Column = InputColumn,
+      % input is valid, stop repeating
+      !
+      ;
+      % input is not a valid column index, print an error message and repeat
+      write('Error: invalid column index. Column index must be between 1 and 12.'), nl,
+      fail)
+     ;
+     % input is not a valid row index, print an error message and repeat
+     write('Error: invalid row index. Row index must be between 1 and 12.'), nl,
+     fail).
