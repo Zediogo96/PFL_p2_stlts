@@ -20,8 +20,6 @@ atomic_list_concat_([A|As],Sep,[[]|Args]) :- A = Sep,
 atomic_list_concat_([A|As],Sep,[[A|Arg]|Args]) :- A\=Sep,
                                                   atomic_list_concat_(As,Sep,[Arg|Args]).
 
-
-
 % ---------------------------------------------------------------------------%
 
 % count_board_pieces(+Board, +BCount, +WCount, -BCountOut, -WCountOut)

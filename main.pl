@@ -8,7 +8,6 @@
 :- consult('game_logic.pl').
 :- consult('utils.pl').
 
-
 read_codes(Stream, []) :-
     at_end_of_stream(Stream).
 read_codes(Stream, [Code|Codes]) :-

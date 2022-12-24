@@ -2,9 +2,6 @@ play :-
     initial_state(GameState-Player),
     display_game(GameState-Player).
 
-
-    
-
 instructions :-
     write(' _____________________________________________________________'), nl,
     write('|                     Stlts - Board Game                      |'), nl,

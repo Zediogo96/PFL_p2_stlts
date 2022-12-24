@@ -44,11 +44,13 @@ move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     (   FromRowNum == ToRowNum, FromColumnNum \== ToColumnNum % horizontal move
     ->  check_col_range(FromColumnNum, ToColumnNum, FromRowNum),
         check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
+        has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
         replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
         replace_board_piece(ToRowNum, ToColumnNum, BoardPiece) % place the board piece at the ending position
     ;   FromColumnNum == ToColumnNum, FromRowNum \== ToRowNum % vertical move
     ->  check_row_range(FromRowNum, ToRowNum, FromColumnNum),
         check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
+        has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
         replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
         replace_board_piece(ToRowNum, ToColumnNum, BoardPiece) % place the board piece at the ending position
     ).
@@ -148,7 +150,7 @@ is_row_range_clear_greater(StartRow, EndRow, Column) :-
 check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     get_board_piece(FromRowNum, FromColumnNum, FromBoardPiece),
     get_board_piece(ToRowNum, ToColumnNum, ToBoardPiece),
-    write(FromBoardPiece), write('<---->'), write(ToBoardPiece), nl,
+    % write(FromBoardPiece), write('<---->'), write(ToBoardPiece), nl,
     (   FromBoardPiece = board_piece(_, _, FromType, _, _),
         ToBoardPiece = board_piece(_, _, ToType, _, _),
         FromType = ToType
@@ -195,6 +197,24 @@ validate_indices(_, _, _, EndColumn) :-
     write('Error: invalid end column index. End column index must be between 1 and 12.'), nl,
     fail.
 
+% has_enough_pins(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+    get_board_piece(FromRowNum, FromColumnNum, BoardPiece),
+    (   FromRowNum == ToRowNum, FromColumnNum \== ToColumnNum % horizontal move
+    ->  BoardPiece = board_piece(_, _, Type, _, BlackPins),
+        (   BlackPins >= abs(FromColumnNum - ToColumnNum)
+        ->  true
+        ;   write('Error: not enough black pins to make the move'), nl,
+            false
+        )
+    ;   FromColumnNum == ToColumnNum, FromRowNum \== ToRowNum % vertical move
+    ->  BoardPiece = board_piece(_, _, Type, WhitePins, _),
+        (   WhitePins >= abs(FromRowNum - ToRowNum)
+        ->  true
+        ;   write('Error: not enough white pins to make the move'), nl,
+            false
+        )
+    ).
 % ------------------------ END BOUNDARIES CHECK ------------------------
 
 % game_over(+Board, +Player, -Winner)
