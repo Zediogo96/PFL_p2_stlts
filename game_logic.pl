@@ -223,7 +223,8 @@ has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
 % ------------------------ END BOUNDARIES CHECK ------------------------
 
 % game_over(+Board, +Player, -Winner)
-game_over(Board, Player, Winner) :-
+game_over(Winner) :-
+    current_board(Board),
     % count the number of board pieces with type 'B' and type 'W' in the board
     count_board_pieces(Board, 0, 0, BCount, WCount),
     % check if either player has no more board pieces

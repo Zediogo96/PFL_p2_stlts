@@ -1,8 +1,22 @@
-play :-
+play_pvp :-
     initial_state(GameState-Player),
-    display_game(GameState-Player), nl,
-    manage_piece(Piece),
-    display_game(GameState-Player), nl.
+    game_loop(GameState-Player).
+
+game_loop(GameState-Player) :-
+    
+    repeat,
+    game_over(Winner),
+    (Winner \= None ->
+     % game is over, display the final game state and stop looping
+     display_game(GameState-Player), nl,
+     write('Game over! Winner: '), write(Winner), nl
+     ;
+     % game is not over, display the current game state and allow the player to make a move
+     display_game(GameState-Player), nl,
+     manage_piece(Piece),
+     % set player to the next player
+     (Player = player1 -> NextPlayer = player2; NextPlayer = player1)),
+     game_loop(GameState-NextPlayer).
 
 instructions :-
     write(' _____________________________________________________________'), nl,
@@ -45,10 +59,10 @@ write_menu_list :-
 write_menu_list.
 
 % menu_option(+OptionNumber, -Option)
-menu_option(1, play).
-menu_option(2, instructions).
-menu_option(3, quit).
-
+menu_option(1, play_pvp).
+menu_option(2, play_bot).
+menu_option(3, instructions).
+menu_option(4, quit).
 
 % manage_piece(-Piece)
 manage_piece(Piece) :-
