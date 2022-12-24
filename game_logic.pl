@@ -38,22 +38,27 @@ move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     validate_movement_inputs(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum), % combines validate_indices/4 and validate_not_diagonal/4
     once(move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)). % use once/1 to prevent backtracking
 
-% move_board_piece_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
-move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
-    get_board_piece(FromRowNum, FromColumnNum, BoardPiece), % get the board piece at the starting position
+
+%validate_move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     (   FromRowNum == ToRowNum, FromColumnNum \== ToColumnNum % horizontal move
     ->  check_col_range(FromColumnNum, ToColumnNum, FromRowNum),
         check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
-        has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
-        replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
-        replace_board_piece(ToRowNum, ToColumnNum, BoardPiece) % place the board piece at the ending position
+        has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)
     ;   FromColumnNum == ToColumnNum, FromRowNum \== ToRowNum % vertical move
     ->  check_row_range(FromRowNum, ToRowNum, FromColumnNum),
         check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
-        has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
-        replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
-        replace_board_piece(ToRowNum, ToColumnNum, BoardPiece) % place the board piece at the ending position
+        has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)
+        
     ).
+
+% move_board_piece_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+    get_board_piece(FromRowNum, FromColumnNum, BoardPiece), % get the board piece at the starting position
+    validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
+    replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
+    replace_board_piece(ToRowNum, ToColumnNum, BoardPiece). % place the board piece at the ending position
+    
 
 % ------------------------ UPDATE PINS -----------------------------
 
