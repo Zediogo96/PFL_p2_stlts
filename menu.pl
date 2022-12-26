@@ -13,7 +13,7 @@ game_loop(GameState-Player) :-
      ;
      % game is not over, display the current game state and allow the player to make a move
      display_game(GameState-Player), nl,
-     manage_piece(Piece),
+     manage_piece(Piece, Player),
      % set player to the next player
      (Player = player1 -> NextPlayer = player2; NextPlayer = player1)),
      game_loop(GameState-NextPlayer).
@@ -75,7 +75,7 @@ menu_option(3, instructions).
 menu_option(4, quit).
 
 % manage_piece(-Piece)
-manage_piece(Piece) :-
+manage_piece(Piece, Player) :-
     repeat,
     % get valid row and column input from the user
     get_valid_row_column_input(Row, Column),
@@ -83,6 +83,14 @@ manage_piece(Piece) :-
     get_board_piece(Row, Column, Piece),
     % check if the selected piece is not empty
     Piece = board_piece(PieceRN, PieceCN, Type, _, _),
+    % Player should only be able to select pieces of his color
+    (
+    Player = player1, Type = 'W' -> true;
+    Player = player2, Type = 'B' -> true;
+    % selected piece is not the same color as the player, print an error message and repeat
+     write('Error: Selected piece is not the same color as the current player.'), nl,
+     fail
+    ),
     (Type \= ' ' -> 
     % display the menu of options
     nl,
