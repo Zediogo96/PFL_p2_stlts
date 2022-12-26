@@ -2,6 +2,12 @@ play_pvp :-
     initial_state(GameState-Player),
     game_loop(GameState-Player).
 
+% AINDA PARA MODO DEBUG
+play_bot :-
+    initial_state(GameState-Player),
+    display_game(GameState-Player), nl.
+
+
 game_loop(GameState-Player) :-
     
     repeat,
@@ -112,15 +118,18 @@ manage_piece(Piece, Player) :-
      ;
      Option = 3 ->
      % move the piece
-      write('NOT IMPLEMENTED')
+      get_valid_move_destinations(PieceRN, PieceCN, ValidDestinations),
+      print_valid_move_destinations(ValidDestinations),
+      select_valid_move_destination(PieceToRN, PieceToCN, ValidDestinations),
+      move_board_piece(PieceRN, PieceCN, PieceToRN, PieceToCN)
      ;
      Option = 4 ->
         % back to get_valid_row_column_input
-        manage_piece(Piece), true
+        manage_piece(Piece, Player), true
      ;
      % invalid option, print an error message and repeat
      write('Error: invalid option.'), nl,
-     manage_piece(Piece));
+     manage_piece(Piece, Player));
     
      % the selected piece is empty, print an error message and repeat
      write('Error: the selected piece is empty.'), nl,
@@ -152,3 +161,25 @@ get_valid_row_column_input(Row, Column) :-
      % input is not a valid row index, print an error message and repeat
      write('Error: invalid row index. Row index must be between 1 and 12.'), nl,
      fail).
+
+% print_valid_move_destinations(+ValidDestinations)
+print_valid_move_destinations(ValidDestinations) :-
+    write('Valid Destinations: '), write(ValidDestinations), nl,
+    length(ValidDestinations, NumValidDestinations),
+    format('There are ~w valid destinations for this piece:\n', [NumValidDestinations]),
+    helper_print_valid_moves(ValidDestinations, 1).
+
+% print_valid_move_destinations(+ValidDestinations, +Num)
+helper_print_valid_moves([], _).
+helper_print_valid_moves([(ToRowNum, ToColumnNum)|ValidDestinations], Num) :-
+    format('~w. (~w, ~w)\n', [Num, ToRowNum, ToColumnNum]),
+    Num1 is Num + 1,
+    helper_print_valid_moves(ValidDestinations, Num1).
+
+% select_valid_move_destination(-ToRowNum, -ToColumnNum, +ValidDestinations)
+select_valid_move_destination(ToRowNum, ToColumnNum, ValidDestinations) :-
+    write('Enter destination number: '),
+    read(Selection),
+    nth1(Selection, ValidDestinations, (ToRowNum, ToColumnNum)).
+
+
