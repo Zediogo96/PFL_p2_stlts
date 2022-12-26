@@ -4,6 +4,12 @@ is_between(Lower, Upper, X) :-
     Lower =< Upper,
     Lower =< X,
     X =< Upper.
+
+% char_to_int(+Char, -Int)
+char_to_int(Char, Int) :-
+    char_code(Char, Code),
+    Int is Code - 96.
+
     
 %---------------------------------------------------------------------------%
 

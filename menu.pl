@@ -146,8 +146,9 @@ get_valid_row_column_input(Row, Column) :-
     (is_between(1, 12, InputRow) ->
      Row = InputRow,
      % get column input from the user
-     write('   -- Enter column number: '),
-     read(InputColumn),
+     write('   -- Enter column letter: '),
+     read(InputChar),
+     char_to_int(InputChar, InputColumn),
      % check if the input is a valid column index
      (is_between(1, 12, InputColumn) ->
       Column = InputColumn,
@@ -164,10 +165,11 @@ get_valid_row_column_input(Row, Column) :-
 
 % print_valid_move_destinations(+ValidDestinations)
 print_valid_move_destinations(ValidDestinations) :-
-    write('Valid Destinations: '), write(ValidDestinations), nl,
-    length(ValidDestinations, NumValidDestinations),
-    format('There are ~w valid destinations for this piece:\n', [NumValidDestinations]),
-    helper_print_valid_moves(ValidDestinations, 1).
+    length(ValidDestinations, NumValidDestinations), nl,
+    (NumValidDestinations =:= 0 -> 
+    write('There are no valid destinations for this piece.'), nl, fail;
+    format('There are ~w valid destinations for this piece:\n', [NumValidDestinations]), nl,
+    helper_print_valid_moves(ValidDestinations, 1)).
 
 % print_valid_move_destinations(+ValidDestinations, +Num)
 helper_print_valid_moves([], _).

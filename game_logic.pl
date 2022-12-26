@@ -100,7 +100,7 @@ is_column_range_clear_smaller(StartColumn, EndColumn, Row) :-
         get_board_piece(Row, StartColumn1, BoardElement),
         (   BoardElement = board_piece(_, _, ' ', _, _)
         ->  is_column_range_clear_smaller(StartColumn1, EndColumn, Row)
-        ;   write('Error: encountered a non-empty board piece in column range'), nl,
+        ;   /* write('Error: encountered a non-empty board piece in column range'), nl, */
             fail, !
         )
     ).
@@ -114,7 +114,7 @@ is_column_range_clear_greater(StartColumn, EndColumn, Row) :-
         get_board_piece(Row, StartColumn1, BoardElement),
         (   BoardElement = board_piece(_, _, ' ', _, _)
         ->  is_column_range_clear_greater(StartColumn1, EndColumn, Row)
-        ;   write('Error: encountered a non-empty board piece in column range'), nl,
+        ;   /* write('Error: encountered a non-empty board piece in column range'), nl, */
             fail, !
         )
     ).
@@ -137,8 +137,8 @@ is_row_range_clear_smaller(StartRow, EndRow, Column) :-
         get_board_piece(StartRow1, Column, BoardElement), % use get_board_piece/3 instead of board_element/3
         (   BoardElement = board_piece(_, _, ' ', _, _)
         ->  is_row_range_clear_smaller(StartRow1, EndRow, Column)
-        ;   write('Error: encountered a non-empty board piece in row range'), nl,
-            !
+        ;   /* write('Error: encountered a non-empty board piece in row range'), nl, */
+            fail, !
         )
     ).
 
@@ -151,7 +151,7 @@ is_row_range_clear_greater(StartRow, EndRow, Column) :-
         get_board_piece(StartRow1, Column, BoardElement), % use get_board_piece/3 instead of board_element/3
         (   BoardElement = board_piece(_, _, ' ', _, _)
         ->  is_row_range_clear_greater(StartRow1, EndRow, Column)
-        ;   write('Error: encountered a non-empty board piece in row range'), nl,
+        ;   /* write('Error: encountered a non-empty board piece in row range'), nl, */
             fail, !
         )
     ).
@@ -164,7 +164,7 @@ check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     (   FromBoardPiece = board_piece(_, _, FromType, _, _),
         ToBoardPiece = board_piece(_, _, ToType, _, _),
         FromType = ToType
-    ->  write('Error: cannot move a piece to a position with a piece of the same type'), nl,
+    ->  /* write('Error: cannot move a piece to a position with a piece of the same type'), nl, */
         fail, !
     ;   true
     ).
@@ -182,7 +182,7 @@ validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
      true),
     (abs(StartRow - EndRow) \= abs(StartColumn - EndColumn) ->
      true ;
-     write('Error: move cannot be diagonal.'), nl,
+     /* write('Error: move cannot be diagonal.'), nl, */
      fail).
 
 validate_indices(StartRow, StartColumn, EndRow, EndColumn) :-
@@ -214,14 +214,14 @@ has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     ->  BoardPiece = board_piece(_, _, Type, _, BlackPins),
         (   BlackPins >= abs(FromColumnNum - ToColumnNum)
         ->  true
-        ;   write('Error: not enough black pins to make the move'), nl,
+        ;   /* write('Error: not enough black pins to make the move'), nl, */
             false
         )
     ;   FromColumnNum == ToColumnNum, FromRowNum \== ToRowNum % vertical move
     ->  BoardPiece = board_piece(_, _, Type, WhitePins, _),
         (   WhitePins >= abs(FromRowNum - ToRowNum)
         ->  true
-        ;   write('Error: not enough white pins to make the move'), nl,
+        ;   /* write('Error: not enough white pins to make the move'), nl, */
             false
         )
     ).
