@@ -56,9 +56,23 @@ instructions :-
 quit :-
     nl.
 
+% logo/0, prints the game logo.
+logo:-
+nl,nl,nl,nl,
+write('**************************************************'),nl,
+write('*  @@@@@@@@ @@@@@@@@  @@    @@@@@@@@  @@@@@@@@   *'),nl,
+write('*  @@          @@     @@       @@     @@         *'),nl,
+write('*  @@          @@     @@       @@     @@         *'),nl,
+write('*  @@@@@@@@    @@     @@       @@     @@@@@@@@   *'),nl,
+write('*        @@    @@     @@       @@           @@   *'),nl,
+write('*        @@    @@     @@       @@           @@   *'),nl,
+write('*  @@@@@@@@    @@     @@@@@@@  @@     @@@@@@@@   *'),nl,
+write('**************************************************'),nl,nl.
+
 menu :-
     repeat,
     nl,
+    logo,
     write('Please select a number:'), nl,
     write_menu_list,
     read(OptionNumber),
