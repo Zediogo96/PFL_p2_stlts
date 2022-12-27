@@ -2,10 +2,9 @@ play_pvp :-
     initial_state(GameState-Player),
     game_loop(GameState-Player).
 
-% AINDA PARA MODO DEBUG
 play_bot :-
     initial_state(GameState-Player),
-    display_game(GameState-Player), nl.
+    game_loop_bot_easy(GameState-Player).
 
 
 game_loop(GameState-Player) :-
@@ -23,6 +22,50 @@ game_loop(GameState-Player) :-
      % set player to the next player
      (Player = player1 -> NextPlayer = player2; NextPlayer = player1)),
      game_loop(GameState-NextPlayer).
+
+
+
+game_loop_bot_easy(GameState-Player) :-
+    
+    repeat,
+    game_over(Winner),
+    (Winner \= None ->
+     % game is over, display the final game state and stop looping
+     write('Game over! Winner: '), write(Winner), nl
+     ;
+        % if player=player1
+        (Player = player1 ->
+            % game is not over, display the current game state and allow the player to make a move
+            display_game(GameState-Player), nl,
+            manage_piece(Piece, Player),
+            % set player to the next player
+            (Player = player1 -> NextPlayer = bot1; NextPlayer = player1)),
+            game_loop_bot_easy(GameState-NextPlayer);
+        % if player=bot1
+        (Player = bot1 ->
+            % game is not over, display the current game state and allow the player to make a move
+            %display_game(GameState-Player), nl,
+            manage_piece_bot_easy(Piece),
+            % set player to the next player
+            (Player = bot1 -> NextPlayer = player1; NextPlayer = bot1)),
+            game_loop_bot_easy(GameState-NextPlayer)).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 instructions :-
     write(' _____________________________________________________________'), nl,
