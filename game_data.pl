@@ -182,7 +182,8 @@ initialize_current_board :-
 initial_state(GameState-Player) :-
     current_board(Board), % fetch the initial board state
     GameState = Board, % assign the initial board state to GameState
-    Player = player1.
+    Player = player1,
+    Bot = bot1.
 
 % revert_board
 % update the current board with the initial board state
