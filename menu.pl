@@ -4,7 +4,7 @@ play_pvp :-
 
 play_bot :-
     initial_state(GameState-Player),
-    game_loop_bot_easy(GameState-Player).
+    game_loop_bot_hard(GameState-Player).
 
 
 game_loop(GameState-Player) :-
@@ -25,7 +25,7 @@ game_loop(GameState-Player) :-
 
 
 
-game_loop_bot_easy(GameState-Player) :-
+game_loop_bot_hard(GameState-Player) :-
     
     repeat,
     game_over(Winner),
@@ -40,15 +40,19 @@ game_loop_bot_easy(GameState-Player) :-
             manage_piece(Piece, Player),
             % set player to the next player
             (Player = player1 -> NextPlayer = bot1; NextPlayer = player1)),
-            game_loop_bot_easy(GameState-NextPlayer);
+            game_loop_bot_hard(GameState-NextPlayer);
         % if player=bot1
         (Player = bot1 ->
             % game is not over, display the current game state and allow the player to make a move
             %display_game(GameState-Player), nl,
-            manage_piece_bot_easy(Piece),
+            manage_piece_bot_hard(Piece),
             % set player to the next player
             (Player = bot1 -> NextPlayer = player1; NextPlayer = bot1)),
-            game_loop_bot_easy(GameState-NextPlayer)).
+            game_loop_bot_hard(GameState-NextPlayer)).
+
+
+
+
 
 
 
