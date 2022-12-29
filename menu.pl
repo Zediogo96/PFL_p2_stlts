@@ -188,7 +188,8 @@ print_valid_move_destinations(ValidDestinations) :-
 % print_valid_move_destinations(+ValidDestinations, +Num)
 helper_print_valid_moves([], _).
 helper_print_valid_moves([(ToRowNum, ToColumnNum)|ValidDestinations], Num) :-
-    format('~w. (~w, ~w)\n', [Num, ToRowNum, ToColumnNum]),
+    int_to_char(ToColumnNum, ToColumnChar),
+    format('~w. (~w, ~w)\n', [Num, ToRowNum, ToColumnChar]),
     Num1 is Num + 1,
     helper_print_valid_moves(ValidDestinations, Num1).
 

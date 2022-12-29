@@ -10,6 +10,23 @@ char_to_int(Char, Int) :-
     char_code(Char, Code),
     Int is Code - 96.
 
+% int_to_char(+Int, -Char)
+int_to_char(Int, Char) :-
+Code is Int + 96,
+char_code(Char, Code).
+
+% select_random_black_piece(-RowNum, -ColNum)
+select_random_black_piece(RowNum, ColNum) :-
+    findall(Row-Col, (member(Row, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Col, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(Row, Col, board_piece(_, _, 'B', _, _))), BlackPieces),
+    length(BlackPieces, NumBlackPieces),
+    random(1, NumBlackPieces, RandomIndex),
+    nth1(RandomIndex, BlackPieces, RowNum-ColNum).
+
+get_random_destination(MoveDestinations, TR, TC) :-
+    length(MoveDestinations, NumDestinations),
+    random(0, NumDestinations, Index),
+    nth0(Index, MoveDestinations, RandomDestination),
+    (TR, TC) = RandomDestination.
     
 %---------------------------------------------------------------------------%
 

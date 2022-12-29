@@ -55,9 +55,12 @@ validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
 % move_board_piece_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
 move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     get_board_piece(FromRowNum, FromColumnNum, BoardPiece), % get the board piece at the starting position
+    % extract board piece information
+    BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
     validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
     replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
-    replace_board_piece(ToRowNum, ToColumnNum, BoardPiece). % place the board piece at the ending position
+    replace_board_piece(ToRowNum, ToColumnNum, board_piece(ToRowNum, ToColumnNum, Type, NumWhitePins, NumBlackPins)). % place the board piece at the ending position
+
 
 
 % get_valid_move_destinations(+FromRowNum, +FromColumnNum, -MoveDestinations)
@@ -234,3 +237,48 @@ game_over(Winner) :-
     count_board_pieces(Board, 0, 0, BCount, WCount),
     % check if either player has no more board pieces
     (BCount = 0 -> Winner = Player2; WCount = 0 -> Winner = Player1; Winner = 'None').
+
+% -----------------------------------------------------------------------
+
+% closest_black_piece(-RowNum, -ColNum)
+closest_black_piece(RowNum, ColNum) :-
+    findall((X-Y-Dist), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]),get_board_piece(X, Y, board_piece(X, Y, 'B', _, _)), distance_to_white_piece(X, Y, Dist)), L),
+    sort_list_by_dist(L, SortedList),
+    nth1(1, SortedList, (RowNum-ColNum-Dist)),
+    write('Closest black piece: '), write(RowNum), write('-'), write(ColNum),
+    write(' with distance: '), write(Dist), nl.
+
+
+% distance_to_white_piece(+RowNum, +ColNum, -Distance)
+distance_to_white_piece(RowNum, ColNum,  Distance) :-
+    % write('Black Piece at: '), write(RowNum), write('-'), write(ColNum), nl,
+    findall(X-Y, (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(X, Y, board_piece(X, Y, 'W', _, _))), WhitePieces),
+    maplist(distance(RowNum, ColNum), WhitePieces, Distances),
+    sort(Distances, SortedDistances),
+    nth1(1, SortedDistances, Distance).
+    
+% distance(+RowNum, +ColNum, +WhitePiece, -Distance)
+distance(RowNum, ColNum, X-Y, Distance) :-
+    % write('White Piece at: '), write(X), write('-'), write(Y), write(' '), write('Distance: '),
+    Distance is sqrt((RowNum - X)^2 + (ColNum - Y)^2).
+
+% sort_list_by_dist(+List, -SortedList)
+sort_list_by_dist(List, SortedList) :-
+    sort_list_by_dist(List, [], SortedList).
+
+% sort_list_by_dist(+List, +Acc, -SortedList)
+sort_list_by_dist([], Acc, Acc).
+sort_list_by_dist([X-Y-Dist|T], Acc, SortedList) :-
+    insert_sorted(X-Y-Dist, Acc, Acc1),
+    sort_list_by_dist(T, Acc1, SortedList).
+
+% insert_sorted(+Elem, +List, -SortedList)
+insert_sorted(X-Y-Dist, [], [X-Y-Dist]).
+insert_sorted(X-Y-Dist, [X1-Y1-Dist1|T], [X-Y-Dist,X1-Y1-Dist1|T]) :-
+    Dist < Dist1.
+insert_sorted(X-Y-Dist, [X1-Y1-Dist1|T], [X1-Y1-Dist1|T1]) :-
+    Dist >= Dist1,
+    insert_sorted(X-Y-Dist, T, T1).
+
+% find_b(BlackPieces) :-
+% findall((X,Y), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(X, Y, board_piece(X, Y, 'B', _, _))), BlackPieces).
