@@ -24,9 +24,9 @@ Stlts is a strategy game developed using Prolog for FEUP's PFL (Logic and Functi
 
 ## Game Rules
 
-Stlts is a strategic board game, played on a 12x12 checkerboard with cork-centered pieces into which pins are placed. The object of the game is to take all the opponent's pieces.
+__Stlts__ is a strategic board game, played on a 12x12 checkerboard with black and white pieces into which pins are placed. The objective of the game is to take all the opponent's pieces.
 
-Players take turns. White begins.
+Players take turns, with white pieces beggining.
 
 On each turn a player may either
 
@@ -49,18 +49,34 @@ In this digital version of the game, there are 3 game modes:
 
 ### Internal representation of the state of the game
 
+To represent the game data in Prolog, we used the following model:
 
+| Game Element   | Representation |
+| ----------- | ----------- |
+| Piece |    |
+| Board |    |
 
-
-
+__TODO__
 
 ### Game state view
 
-
+__TODO__
 
 ### Moves Execution
 
+Each turn, a player is asked to choose the row and column of the piece they wish to move. Then, 3 options are available:
+ 
+ - Increment white pin
+ - Increment black pin
+ - Move piece 
 
+ The first two options are self-explainatory: in each of them, the corresponding predicates - `increment_white_pin(RowNum, ColumnNum)` and `increment_black_pin(RowNum, ColumnNum)` - are called with the row and column of the current piece, updating the number of pins in its interrnal representation.
+
+The third option is a bit more complex. having the row and column of the chosen piece, a list of available moves is displayed, from which the player must choose one. To get this list, we use the predicate `valid_moves(+FromRowNum, +FromColumnNum, -MoveDestinations)`, which is described in more detail in the next section. Then, the predicate `move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)` is called, and the coordinates of the piece are updated. This way, we can make sure that the player only chooses a vald move, and if there are none, the only option is to increment the pins in the piece.
+
+![picture 7](images/9de3b6edbc60909e5ac2cddf533835ecd0581cb98d3437cc0821089834a1b86e.png) 
+
+In this image, the player chose the piece in 5.c., the option to move it with 3. and finally the move destination (4,c) with 1. - having a white and black pin, the moves could be of 1 unit horizontally or vertically - the options presented.
 
 
 ### List of Valid Moves
@@ -71,93 +87,72 @@ To do this, we use the following predicates:
 
 | Predicate   | Description |
 | ----------- | ----------- |
-|             |             |
-|             |             |
+| `validate_move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)`    |  Checks if a move is valid, based on the rules of the game described above. This is done based on other predicates, such as `check_col_range(+StartColumn, +EndColumn, +Row)`, `check_row_range(+StartRow, +EndRow, +Column)`, `check_same_type(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)`, `has_enough_pins(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)`        |
+| `valid_moves(+FromRowNum, +FromColumnNum, -MoveDestinations)`          |   Returns __MoveDestinations__, which lists all possible moves based on the initial row and column of a piece.        |
 
 
-### End of Game
-### Board Evaluation
+With __MoveDestinations__, we can then evaluate the possible moves for the player, and best or random moves for the bot.
+
+### End of Game / Board Evaluation
+
+The game ends when one of the players has no more pieces on the board. The player with the most pieces wins.
+
+The predicate used to check for the end of the game is `game_over(-Winner, +Mode)`. This predicate counts the remainig pieces of each colour in the board using `count_board_pieces(+Board, +BCount, +WCount, -BCountOut, -WCountOut)`, which evaluates the board, returning the respective count in BCountOut and WCountOut. Based on this and on the mode (PvP pr PvE), the winner will be "Player1", "Player2" or "Bot".
+
+![picture 5](images/a635f6905890210ab0a1934201f99dbaf5ca03bf0158790ce39dd517f261db74.png)  
+
+Piece count after evaluating the board
+
+![picture 6](images/58ee68a7f07be9d8e06dbc5883a638632e81e0e70ac35fdce98265e503b29b78.png)
+
+Game over situation
+
 ### Computer move
 
+The bot can play in two different difficulty levels:
 
+- Level 1: Random moves - "easy" mode
+- Level 2: Greedy algorithm - "hard" mode
 
-Our `GameState` predicate is composed of `GameBoard` and `PlayerTurn` (`GameState` = `[GameState|PlayerTurn]`), where:
+For both difficulty levels, there is a speceific game loop which calls a function that allows the bot to make a choice.
 
-- `GameBoard` is represented by a 2d list, in which each sublist is a line in the board.
-In the `initial_state(+Size, -GameState)` predicate, an initial gameboard is generated with first and last rows being the player pieces (white and black respectively) and the rest being the empty cells that the pieces can move.
-- `PlayerTurn` can either be a value of `black` or `white` indicating the current player turn.
+#### Easy bot
 
-The view of the game is output by the predicate `display_game(+GameState)`, where it loops through the `GameBoard` cell by cell and outputs the respective element, and then outputs the player that has to make a move in the current turn.
+The predicate which allows this bot to make a choice is called `manage_piece_bot_easy(-Piece)`. It uses a variety of other predicates, which are described in order below.
 
+- `select_random_black_piece(-RowNum, -ColNum)` - selects the coordinates of a random black piece and returns in RowNum, ColNum. 
 
-![main menu](./img/menu.png)
+- `valid_moves(+FromRowNum, +FromColumnNum, -MoveDestinations)` - checks if there are valid moves (described earlier)
 
-#### **Player x Player**
+- If there are valid moves, select a random one with `get_random_destination(+MoveDestinations, -TR, -TC)`
 
-After choosing the size of the square board the game will begin being the player one the one to control the white marblers and player 2 the one to control the black marbles.
+- If there are no valid moves, select a random pin color to increment and use on of the predicates: `increment_white_pin(RowNum, ColumnNum)` or `increment_black_pin(RowNum, ColumnNum)`.
 
-![menu_board](./img/select_board.png)
+- The predicate `random` is used to generate a random number everytime we want to make a random choice.
 
-#### **Player x Computer**
+### Hard bot
 
-After choosing the square board size like in the first option now we need to choose which player we wan't to be.
+The predicate which allows this bot to make a choice is called `manage_piece_bot_hard(-Piece)`. It uses a variety of other predicates, which are described in order below.
 
-If the player choose to be black, then the computer will make it's first move and the game will begin soon after that.
+- `closest_black_piece(-BlackRow, -BlackColumn, -WhiteRow, -WhiteCol)` - selects the coordinates of the black piece that is closest to a white piece and returns the coordinates of the two pieces that are close to each other in BlackRow, BlackColumn, WhiteRow, WhiteCol
 
-![menu computer](./img/choose_player_x_computer.png)
+- `get_board_piece(+RowNum, +ColNum, -Piece)` - gets the closest black piece representation (with pins, etc.) in the board at the given coordinates
 
-After every movement, being that from the player or the computer, we have presented in the screen the current movement with a marble initial position and last position.
+- `Vdis is abs(BlackRow-WhiteRow), Hdis is abs(BlackColumn-WhiteCol)` - calculates the vertical and horizontal distances between the two pieces, to be used later in calculations and best move choice
 
-![menu computer](./img/8x8_board.png)
+- `valid_moves(+FromRowNum, +FromColumnNum, -MoveDestinations)` - checks if there are valid moves (described earlier)
 
-### Movement
- Each turn a player is asked to input their movement, the input should be similar to the standard method for recording and describing the *moves in a game of chess for a pawn* (e.g. to move a piece on position B1 to B3, input `b1b3.`, everything together without spaces)
+- After all these predicates, we have a big logic block that chceks first if the pieces are in the same row/different column, same column/different row or different row and column. For each case, if the bot can move and capture the other piece, it will do that, if not, it will increment the black pin if they are in the same row or the white pin if they are in the same column. For the third case, when both row and column are different, if the calculated horizontal distance is greater than the vertical distance, the white pin will be incremented, otherwise, the black pin will be incremented. This allows the bot to "follow" the movement of the player, and get closer and closer with each play, eventually ending up in a situation where there are enough pins to move and capture the player's piece.
 
- The input that the player entered, is validated and parsed, when an invalid move is taken, a error message is returned and the player is asked to input again.
+The following images depict the behavior of the bot:
 
-The validation proccess is also combined with the predicate `valid_moves_by_piece(+PiecePosition, +GameBoard, -ListOfMoves)` by checking if the move that the player has entered is one of a valid moves on the `ListOfMoves`.
+![picture 1](images/55136687a0f4eeab9e143b7d608d3803015be04a3acfdeff451caf8a43d9602e.png)
 
-After parsing and validating the input, a move is executed using the predicate `move(+GameState, +Move, -NewGameState)`, which replaces the piece on the old position on the board by `empty`, and the new position is replaced with current player's piece.
+![picture 2](images/c23645d52f977df3fbe571016615d1aed8857fb6930857b29b353633d9e53696.png)
 
+![picture 3](images/aa717801eed32dacb3c8c4693e6e02a23734ff3ee512659a286eec5c97f654d5.png)  
 
-### List of valid moves
-
-The combination of row column determines what is a position, and the direction of a move can only be vertical and horizontal movements (no diagonals).
-
-We endup choosing a very straight foward and simple way to play, once it's your turn all the player need to type in is the current position of a marble and the desired new position.
-
-The predicates used for this validations is  `valid_moves_by_piece(+PiecePosition, +GameBoard, -ListOfMoves)`
-
-The predicate `valid_moves(+GameState, -ListOfMoves).`, uses the current game state (game board + current player turn) to find out all the possible moves that the current player can make, this is done by checking all the horizontal and vertical valid moves that each piece of their color can take and stored into the `ListOfMoves`.
-
-
-### Computer
-
-The game can be also played in the player x computer mode, where the player is first asked in the main menu the color that one wants to play, after that it will be headed into a `computer_player_gameloop`, where the computer and the player takes turns on their play.
-
-1. On computer's turn, it chooses a move using the `choose_move(+GameState, +Level, -Move)` , which uses the predicate mentioned previously `valid_moves(+GameState, -ListOfMoves)` to give a list of valid moves that the current pieces can make.
-2. Then, the predicate `random` is used to give a random index in the list of valid moves, and this move is selected, and played by the computer.
-
-
-### Game Over
-
-For validation of game over, we used a combination of verification in the Board from within the Game State and Setting a Flag from within the game loop predicates (this includes `computer_player_gameloop` and `player_player_gameloop` predicates).
-
-1. For each game loop, we first check if the current game state (given by `GameState`) has sastified a condition to end the game, using the predicate `game_over(+GameState, -Winner)`.
-2. This predicate checks whether the current player has its pieces amount inferior to 2, and if so, we can conclude that the previous player has played a move that gave a 'checkmate' to this current player, and therefore conclude with a winner, and the game loop is stopped.
-3. If there is not a game over condition, then `Winner` will be given the value `none` and the game will be continued.
-
-
-### Example of Game winning
-
-The capture can occour if horizontally or vertically: 
--  you position your marble in between two enemy marbles
-![menu computer](./img/black_before.png)
-![menu computer](./img/black_win.png)
-- you position two of your marbles around an enemy marble.
-![menu computer](./img/white_before.png)
-![menu computer](./img/white_win.png)
-
+![picture 4](images/2a9936bcf5f8e23e6b4f7ea3d8d200ad230d7f88e44b9e6382a5b71e17f22143.png)  
 
 ### Conclusions
 
@@ -167,4 +162,5 @@ Developing a game in Prolog was a highly educational and enriching experience. I
 ***
 - [igGameCenter](https://www.iggamecenter.com/en/rules/stlts)
 - [Board Game Geek](https://boardgamegeek.com/boardgame/16237/stlts)
+- [YouTube - Mango Town Plays](https://www.youtube.com/watch?v=mEaDUg-L7aE)
 - [SicTus Prolog 4](https://sicstus.sics.se/)
