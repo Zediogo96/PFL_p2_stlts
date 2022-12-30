@@ -2,36 +2,44 @@ play_pvp :-
     initial_state(GameState-Player),
     game_loop(GameState-Player).
 
-play_bot :-
+play_bot_easy :-
     initial_state(GameState-Player),
-    game_loop_bot_hard(GameState-Player).
+    game_loop_bot(GameState-Player, easy).
 
+play_bot_hard :-
+    initial_state(GameState-Player),
+    game_loop_bot(GameState-Player, hard).
 
 game_loop(GameState-Player) :-
     
     repeat,
-    game_over(Winner),
-    (Winner \= None ->
+    game_over(Winner, 'PvP'),
+    (Winner \= 'None' ->
      % game is over, display the final game state and stop looping
      display_game(GameState-Player), nl,
-     write('Game over! Winner: '), write(Winner), nl
+     nl,nl,nl,
+     write('Game Over! Winner: '), write(Winner), nl,
+     revert_board,
+     call(menu)
      ;
      % game is not over, display the current game state and allow the player to make a move
      display_game(GameState-Player), nl,
      manage_piece(Piece, Player),
      % set player to the next player
-     (Player = player1 -> NextPlayer = player2; NextPlayer = player1)),
-     game_loop(GameState-NextPlayer).
+     (Player = player1 -> NextPlayer = player2; NextPlayer = player1),
+     game_loop(GameState-NextPlayer)
+    ).  
 
-
-
-game_loop_bot_hard(GameState-Player) :-
+game_loop_bot(GameState-Player, Level) :-
     
     repeat,
-    game_over(Winner),
-    (Winner \= None ->
+    game_over(Winner, 'PvE'),
+    (Winner \= 'None' ->
      % game is over, display the final game state and stop looping
-     write('Game over! Winner: '), write(Winner), nl
+     nl,nl,nl,
+     write('Game Over! Winner: '), write(Winner), nl,
+     revert_board,
+     call(menu)
      ;
         % if player=player1
         (Player = player1 ->
@@ -39,37 +47,17 @@ game_loop_bot_hard(GameState-Player) :-
             display_game(GameState-Player), nl,
             manage_piece(Piece, Player),
             % set player to the next player
-            (Player = player1 -> NextPlayer = bot1; NextPlayer = player1)),
-            game_loop_bot_hard(GameState-NextPlayer);
+            (Player = player1 -> NextPlayer = bot; NextPlayer = player1)),
+            (Level = easy -> game_loop_bot(GameState-NextPlayer, easy); game_loop_bot(GameState-NextPlayer, hard));
         % if player=bot1
-        (Player = bot1 ->
+        (Player = bot ->
             % game is not over, display the current game state and allow the player to make a move
             %display_game(GameState-Player), nl,
-            manage_piece_bot_hard(Piece),
+            (Level = easy -> manage_piece_bot_easy(Piece); manage_piece_bot_hard(Piece)),
             % set player to the next player
-            (Player = bot1 -> NextPlayer = player1; NextPlayer = bot1)),
-            game_loop_bot_hard(GameState-NextPlayer)).
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            (Player = bot -> NextPlayer = player1; NextPlayer = bot)),
+            (Level = easy -> game_loop_bot(GameState-NextPlayer, easy); game_loop_bot(GameState-NextPlayer, hard))
+    ).
 
 instructions :-
     write(' _____________________________________________________________'), nl,
@@ -137,7 +125,8 @@ write_menu_list.
 
 % menu_option(+OptionNumber, -Option)
 menu_option(1, play_pvp).
-menu_option(2, play_bot).
+menu_option(2, play_bot_easy).
+menu_option(3, play_bot_hard).
 menu_option(3, instructions).
 menu_option(4, quit).
 

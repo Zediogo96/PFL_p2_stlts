@@ -25,7 +25,7 @@ initial_board(
               board_piece(11, 3, ' ', 0, 0),
               board_piece(11, 4, ' ', 0, 0),
               board_piece(11, 5, 'W', 0, 0),
-              board_piece(11, 6, ' ', 0, 0),
+              board_piece(11, 6, 'B', 0, 0),
               board_piece(11, 7, ' ', 0, 0),
               board_piece(11, 8, ' ', 0, 0),
               board_piece(11, 9, ' ', 0, 0),

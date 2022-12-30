@@ -61,8 +61,6 @@ move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
     replace_board_piece(ToRowNum, ToColumnNum, board_piece(ToRowNum, ToColumnNum, Type, NumWhitePins, NumBlackPins)). % place the board piece at the ending position
 
-
-
 % get_valid_move_destinations(+FromRowNum, +FromColumnNum, -MoveDestinations)
 get_valid_move_destinations(FromRowNum, FromColumnNum, MoveDestinations) :-
     % generate all possible ToRowNum and ToColumnNum coordinates
@@ -231,16 +229,25 @@ has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
 % ------------------------ END BOUNDARIES CHECK ------------------------
 
 % game_over(+Board, +Player, -Winner)
-game_over(Winner) :-
+game_over(Winner, Mode) :-
     current_board(Board),
     % count the number of board pieces with type 'B' and type 'W' in the board
     count_board_pieces(Board, 0, 0, BCount, WCount),
     % check if either player has no more board pieces
-    (BCount = 0 -> Winner = Player2; WCount = 0 -> Winner = Player1; Winner = 'None').
 
-% -----------------------------------------------------------------------
-
-
-
-% find_b(BlackPieces) :-
-% findall((X,Y), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(X, Y, board_piece(X, Y, 'B', _, _))), BlackPieces).
+    (Mode == 'PvP' ->
+     (   BCount == 0
+     ->  Winner = 'Player1'
+     ;   WCount == 0
+     ->  Winner = 'Player2'
+     ;   Winner = 'None'
+     )
+    ;
+    Mode == 'PvE' ->
+     (   BCount == 0   
+        ->  Winner = 'Player1'
+        ;   WCount == 0
+        ->  Winner = 'Bot'
+        ;   Winner = 'None'
+        )
+    ).
