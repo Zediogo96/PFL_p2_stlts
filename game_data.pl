@@ -2,7 +2,7 @@
 :- dynamic board_piece/5.
 
 board_piece(RowNumber, ColumnNumber, Type, Whitepins, Blackpins) :-
-    member(Type, ['E', 'W', 'B']),
+    member(Type, [' ', 'W', 'B']),
     WhitePins >= 0,
     BlackPins >= 0.
 
@@ -21,29 +21,29 @@ initial_board(
               board_piece(12, 12, ' ', 0, 0)],
 
             [board_piece(11, 1, ' ', 0, 0),
-              board_piece(11, 2, ' ', 0, 0),
+              board_piece(11, 2, 'W', 0, 0),
               board_piece(11, 3, ' ', 0, 0),
               board_piece(11, 4, ' ', 0, 0),
-              board_piece(11, 5, 'W', 0, 0),
-              board_piece(11, 6, 'B', 0, 0),
+              board_piece(11, 5, ' ', 0, 0),
+              board_piece(11, 6, ' ', 0, 0),
               board_piece(11, 7, ' ', 0, 0),
               board_piece(11, 8, ' ', 0, 0),
               board_piece(11, 9, ' ', 0, 0),
-              board_piece(11, 10, ' ', 0, 0),
+              board_piece(11, 10, 'B', 0, 0),
               board_piece(11, 11, ' ', 0, 0),
               board_piece(11, 12, ' ', 0, 0)],
             
             [board_piece(10, 1, ' ', 0, 0),
-              board_piece(10, 2, ' ', 0, 0),
-              board_piece(10, 3, ' ', 0, 0),
+              board_piece(10, 2, 'W', 0, 0),
+              board_piece(10, 3, 'W', 0, 0),
               board_piece(10, 4, ' ', 0, 0),
-              board_piece(10, 5, ' ', 0, 0),
-              board_piece(10, 6, 'B', 0, 0),
+              board_piece(10, 5, 'B', 0, 0),
+              board_piece(10, 6, ' ', 0, 0),
               board_piece(10, 7, ' ', 0, 0),
-              board_piece(10, 8, ' ', 0, 0),
+              board_piece(10, 8, 'W', 0, 0),
               board_piece(10, 9, ' ', 0, 0),
-              board_piece(10, 10, ' ', 0, 0),
-              board_piece(10, 11, ' ', 0, 0),
+              board_piece(10, 10, 'B', 0, 0),
+              board_piece(10, 11, 'B', 0, 0),
               board_piece(10, 12, ' ', 0, 0)],
             
             [board_piece(9, 1, ' ', 0, 0),
@@ -61,14 +61,14 @@ initial_board(
 
               [board_piece(8, 1, ' ', 0, 0),
               board_piece(8, 2, ' ', 0, 0),
-              board_piece(8, 3, ' ', 0, 0),
+              board_piece(8, 3, 'B', 0, 0),
               board_piece(8, 4, ' ', 0, 0),
-              board_piece(8, 5, ' ', 0, 0),
+              board_piece(8, 5, 'W', 0, 0),
               board_piece(8, 6, ' ', 0, 0),
               board_piece(8, 7, ' ', 0, 0),
-              board_piece(8, 8, ' ', 0, 0),
+              board_piece(8, 8, 'B', 0, 0),
               board_piece(8, 9, ' ', 0, 0),
-              board_piece(8, 10, ' ', 0, 0),
+              board_piece(8, 10, 'W', 0, 0),
               board_piece(8, 11, ' ', 0, 0),
               board_piece(8, 12, ' ', 0, 0)],
 
@@ -100,14 +100,14 @@ initial_board(
 
               [board_piece(5, 1, ' ', 0, 0),
               board_piece(5, 2, ' ', 0, 0),
-              board_piece(5, 3, ' ', 0, 0),
+              board_piece(5, 3, 'W', 0, 0),
               board_piece(5, 4, ' ', 0, 0),
-              board_piece(5, 5, ' ', 0, 0),
+              board_piece(5, 5, 'B', 0, 0),
               board_piece(5, 6, ' ', 0, 0),
               board_piece(5, 7, ' ', 0, 0),
-              board_piece(5, 8, ' ', 0, 0),
+              board_piece(5, 8, 'W', 0, 0),
               board_piece(5, 9, ' ', 0, 0),
-              board_piece(5, 10, ' ', 0, 0),
+              board_piece(5, 10, 'B', 0, 0),
               board_piece(5, 11, ' ', 0, 0),
               board_piece(5, 12, ' ', 0, 0)],
 
@@ -126,28 +126,28 @@ initial_board(
               board_piece(4, 12, ' ', 0, 0)],
               
               [board_piece(3, 1, ' ', 0, 0),
-              board_piece(3, 2, ' ', 0, 0),
-              board_piece(3, 3, ' ', 0, 0),
+              board_piece(3, 2, 'B', 0, 0),
+              board_piece(3, 3, 'B', 0, 0),
               board_piece(3, 4, ' ', 0, 0),
-              board_piece(3, 5, ' ', 0, 0),
+              board_piece(3, 5, 'W', 0, 0),
               board_piece(3, 6, ' ', 0, 0),
               board_piece(3, 7, ' ', 0, 0),
-              board_piece(3, 8, ' ', 0, 0),
+              board_piece(3, 8, 'B', 0, 0),
               board_piece(3, 9, ' ', 0, 0),
-              board_piece(3, 10, ' ', 0, 0),
-              board_piece(3, 11, ' ', 0, 0),
+              board_piece(3, 10, 'W', 0, 0),
+              board_piece(3, 11, 'W', 0, 0),
               board_piece(3, 12, ' ', 0, 0)],
 
               [board_piece(2, 1, ' ', 0, 0),
               board_piece(2, 2, ' ', 0, 0),
-              board_piece(2, 3, ' ', 0, 0),
+              board_piece(2, 3, 'B', 0, 0),
               board_piece(2, 4, ' ', 0, 0),
               board_piece(2, 5, ' ', 0, 0),
               board_piece(2, 6, ' ', 0, 0),
               board_piece(2, 7, ' ', 0, 0),
               board_piece(2, 8, ' ', 0, 0),
               board_piece(2, 9, ' ', 0, 0),
-              board_piece(2, 10, ' ', 0, 0),
+              board_piece(2, 10, 'W', 0, 0),
               board_piece(2, 11, ' ', 0, 0),
               board_piece(2, 12, ' ', 0, 0)],
 
@@ -164,8 +164,7 @@ initial_board(
               board_piece(1, 11, ' ', 0, 0),
               board_piece(1, 12, ' ', 0, 0)]
               ]).
-
-
+             
 % current_board(-Board)
 % assert the initial board state into the database
 :- initialization(initialize_current_board).

@@ -17,12 +17,12 @@ manage_piece_bot_easy(Piece) :-
     % Select a random black piece
     select_random_black_piece(Row, Column),
 
-    get_valid_move_destinations(Row, Column, MoveDestinations),
+    valid_moves(Row, Column, MoveDestinations),
 
     length(MoveDestinations, NumValidDestinations),
         (NumValidDestinations > 0 -> 
         get_random_destination(MoveDestinations, TR, TC),
-        move_board_piece(Row, Column, TR, TC), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [Row, Column, TR, TC]), nl; 
+        move(Row, Column, TR, TC), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [Row, Column, TR, TC]), nl; 
         random(0, 2, Random),
         (Random = 0 -> increment_white_pin(Row,Column), nl, format('Bot added white pin to piece in (~w,~w)', [Row, Column]), nl; increment_black_pin(Row,Column), nl, format('Bot added black pin to piece in (~w,~w)', [Row, Column]), nl)
         ).
@@ -41,20 +41,26 @@ manage_piece_bot_hard(Piece) :-
     Hdis is abs(BlackColumn-WhiteCol),
     
     % Get valid move destinations for the selected black piece
-    get_valid_move_destinations(BlackRow, BlackColumn, MoveDestinations),
+    valid_moves(BlackRow, BlackColumn, MoveDestinations),
 
     (
         (BlackRow == WhiteRow, BlackColumn \= WhiteCol)->
-        (member((WhiteRow,WhiteCol), MoveDestinations) -> move_board_piece(BlackRow, BlackColumn, WhiteRow, WhiteCol); increment_black_pin(BlackRow, BlackColumn))
+        (member((WhiteRow,WhiteCol), MoveDestinations) -> 
+        move(BlackRow, BlackColumn, WhiteRow, WhiteCol), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, WhiteRow, WhiteCol]), nl;
+        increment_black_pin(BlackRow, BlackColumn), nl, format('Bot added black pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl
+        )
         ;
-
         (BlackRow \= WhiteRow, BlackColumn == WhiteCol) ->
-        (member((WhiteRow,WhiteCol), MoveDestinations) -> move_board_piece(BlackRow, BlackColumn, WhiteRow, WhiteCol); increment_white_pin(BlackRow, BlackColumn))
+        (member((WhiteRow,WhiteCol), MoveDestinations) -> 
+        move(BlackRow, BlackColumn, WhiteRow, WhiteCol), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, WhiteRow, WhiteCol]), nl;
+        increment_white_pin(BlackRow, BlackColumn), nl, format('Bot added white pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl
+        )
         ;
         (BlackRow \= WhiteRow, BlackColumn \= WhiteCol) ->
         %check if Hdis is greater or equal than Vdis 
-        (Hdis >= Vdis -> (member((WhiteRow, BlackCol), MoveDestinations) -> move_board_piece(BlackRow, BlackColumn, WhiteRow, BlackCol); increment_white_pin(BlackRow, BlackColumn)); (member((BlackRow, WhiteCol), MoveDestinations) -> move_board_piece(BlackRow, BlackColumn, BlackRow, WhiteCol); increment_black_pin(BlackRow, BlackColumn)))
-  
+        (Hdis >= Vdis -> 
+        (member((WhiteRow, BlackCol), MoveDestinations) -> move(BlackRow, BlackColumn, WhiteRow, BlackCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, WhiteRow, BlackCol]), nl; increment_white_pin(BlackRow, BlackColumn), nl, format('Bot added white pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl); 
+        (member((BlackRow, WhiteCol), MoveDestinations) -> move(BlackRow, BlackColumn, BlackRow, WhiteCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, BlackRow, WhiteCol]), nl; increment_black_pin(BlackRow, BlackColumn), nl, format('Bot added black pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl))
     ).
 
 % closest_black_piece(-RowNum, -ColNum)
@@ -64,9 +70,9 @@ closest_black_piece(RowNum, ColNum, WhiteRow, WhiteCol) :-
     nth1(1, SortedList, (RowNum-ColNum-Dist)),
     arg(1, Dist, Temp),
     arg(1, Temp, WhiteRow), arg(2, Temp, WhiteCol),
-    arg(2, Dist, D),
-    write('White Piece is: '), write(WhiteRow), write('-'), write(WhiteCol), nl,
-    write('Distance is: '), write(D), nl.
+    arg(2, Dist, D).
+    % write('White Piece is: '), write(WhiteRow), write('-'), write(WhiteCol), nl,
+    % write('Distance is: '), write(D), nl.
 
 % distance_to_white_piece(+RowNum, +ColNum, -Distance)
 distance_to_white_piece(RowNum, ColNum,  Distance) :-

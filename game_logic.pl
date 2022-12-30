@@ -33,10 +33,10 @@ replace_at_index(List, Index, Value, NewList) :-
     append(Before, [_|After], List),
     append(Before, [Value|After], NewList).
 
-% move_board_piece(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
-move_board_piece(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+% move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     validate_movement_inputs(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum), % combines validate_indices/4 and validate_not_diagonal/4
-    once(move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)). % use once/1 to prevent backtracking
+    once(move_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)). % use once/1 to prevent backtracking
 
 
 %validate_move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
@@ -52,8 +52,8 @@ validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
         
     ).
 
-% move_board_piece_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
-move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
+% move_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
+move_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     get_board_piece(FromRowNum, FromColumnNum, BoardPiece), % get the board piece at the starting position
     % extract board piece information
     BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
@@ -61,8 +61,8 @@ move_board_piece_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
     replace_board_piece(ToRowNum, ToColumnNum, board_piece(ToRowNum, ToColumnNum, Type, NumWhitePins, NumBlackPins)). % place the board piece at the ending position
 
-% get_valid_move_destinations(+FromRowNum, +FromColumnNum, -MoveDestinations)
-get_valid_move_destinations(FromRowNum, FromColumnNum, MoveDestinations) :-
+% valid_moves(+FromRowNum, +FromColumnNum, -MoveDestinations)
+valid_moves(FromRowNum, FromColumnNum, MoveDestinations) :-
     % generate all possible ToRowNum and ToColumnNum coordinates
     findall((ToRowNum, ToColumnNum), (member(ToRowNum, [0,1,2,3,4,5,6,7,8,9,10,11]), member(ToColumnNum, [0,1,2,3,4,5,6,7,8,9,10,11]), validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)), MoveDestinations).
 

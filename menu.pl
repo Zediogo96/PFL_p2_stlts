@@ -168,10 +168,10 @@ manage_piece(Piece, Player) :-
      ;
      Option = 3 ->
      % move the piece
-      get_valid_move_destinations(PieceRN, PieceCN, ValidDestinations),
+      valid_moves(PieceRN, PieceCN, ValidDestinations),
       print_valid_move_destinations(ValidDestinations),
       select_valid_move_destination(PieceToRN, PieceToCN, ValidDestinations),
-      move_board_piece(PieceRN, PieceCN, PieceToRN, PieceToCN)
+      move(PieceRN, PieceCN, PieceToRN, PieceToCN)
      ;
      Option = 4 ->
         % back to get_valid_row_column_input
