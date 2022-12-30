@@ -2,7 +2,7 @@
 
 ## Project description 
 
-Stlts is a strategy game developed using Prolog for FEUP's PFL (logic and Functional Programming) course.
+Stlts is a strategy game developed using Prolog for FEUP's PFL (Logic and Functional Programming) course.
 
 ### Group members
 
@@ -12,9 +12,11 @@ Stlts is a strategy game developed using Prolog for FEUP's PFL (logic and Functi
 ## Installation And Execution
 
 ### Requisites
-- SICStus Prolog
 
-### Running the game 
+- SICStus Prolog 4.7.1
+
+### Running the game
+
 1. Change directory to the  `/src` folder
 2. Open SICStus Prolog
 3. Run `consult('main.pl').` to start the game application
@@ -76,26 +78,6 @@ To do this, we use the following predicates:
 ### End of Game
 ### Board Evaluation
 ### Computer move
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

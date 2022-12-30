@@ -67,10 +67,11 @@ manage_piece_bot_hard(Piece) :-
 closest_black_piece(RowNum, ColNum, WhiteRow, WhiteCol) :-
     findall((X-Y-Dist), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]),get_board_piece(X, Y, board_piece(X, Y, 'B', _, _)), distance_to_white_piece(X, Y, Dist)), L),
     sort_list_by_dist(L, SortedList),
-    nth1(1, SortedList, (RowNum-ColNum-Dist)),
-    arg(1, Dist, Temp),
+    reverse(SortedList, ReversedList),
+    nth1(1, ReversedList, (RowNum-ColNum-Other)),
+    arg(1, Other, Temp),
     arg(1, Temp, WhiteRow), arg(2, Temp, WhiteCol),
-    arg(2, Dist, D).
+    arg(2, Other, D).
     % write('White Piece is: '), write(WhiteRow), write('-'), write(WhiteCol), nl,
     % write('Distance is: '), write(D), nl.
 
@@ -87,7 +88,7 @@ distance_to_white_piece(RowNum, ColNum,  Distance) :-
 % distance(+RowNum, +ColNum, +WhitePiece, -Distance)
 distance(RowNum, ColNum, X-Y, X-Y-Distance) :-
     % write('White Piece at: '), write(X), write('-'), write(Y), write(' '), write('Distance: '),
-    Distance is sqrt((RowNum - X)^2 + (ColNum - Y)^2).
+    Distance is max(abs(RowNum-X), abs(ColNum-Y)).
 
 % sort_list_by_dist(+List, -SortedList)
 sort_list_by_dist(List, SortedList) :-
