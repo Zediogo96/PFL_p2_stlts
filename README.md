@@ -197,4 +197,4 @@ Developing a game in Prolog was a highly educational and enriching experience. I
 - [igGameCenter](https://www.iggamecenter.com/en/rules/stlts)
 - [Board Game Geek](https://boardgamegeek.com/boardgame/16237/stlts)
 - [YouTube - Mango Town Plays](https://www.youtube.com/watch?v=mEaDUg-L7aE)
-- [SicTus Prolog 4](https://sicstus.sics.se/)
+- [SicsTus Prolog 4](https://sicstus.sics.se/)
