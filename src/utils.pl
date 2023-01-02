@@ -1,33 +1,23 @@
-% HELPER FUNCTIONS
+% HELPER PREDICATES
 
+% is_between(+Lower, +Upper, +X), helper predicate to check boundaries
 is_between(Lower, Upper, X) :-
     Lower =< Upper,
     Lower =< X,
     X =< Upper.
 
-% char_to_int(+Char, -Int)
+% char_to_int(+Char, -Int), converts an alphabetic character to an Integer
+% e.g. -> char_to_int('a', 1), char_to_int('b', 2), char_to_int('c', 3), etc.
 char_to_int(Char, Int) :-
     char_code(Char, Code),
     Int is Code - 96.
 
-% int_to_char(+Int, -Char)
+% int_to_char(+Int, -Char), converts an Integer to an alphabetic character
+% e.g. -> int_to_char(1, 'a'), int_to_char(2, 'b'), int_to_char(3, 'c'), etc.
 int_to_char(Int, Char) :-
 Code is Int + 96,
 char_code(Char, Code).
 
-% select_random_black_piece(-RowNum, -ColNum)
-select_random_black_piece(RowNum, ColNum) :-
-    findall(Row-Col, (member(Row, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Col, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(Row, Col, board_piece(_, _, 'B', _, _))), BlackPieces),
-    length(BlackPieces, NumBlackPieces),
-    random(1, NumBlackPieces, RandomIndex),
-    nth1(RandomIndex, BlackPieces, RowNum-ColNum).
-
-get_random_destination(MoveDestinations, TR, TC) :-
-    length(MoveDestinations, NumDestinations),
-    random(0, NumDestinations, Index),
-    nth0(Index, MoveDestinations, RandomDestination),
-    (TR, TC) = RandomDestination.
-    
 %---------------------------------------------------------------------------%
 
 
@@ -48,14 +38,17 @@ atomic_list_concat_([A|As],Sep,[[A|Arg]|Args]) :- A\=Sep,
 % count_board_pieces(+Board, +BCount, +WCount, -BCountOut, -WCountOut)
 count_board_pieces([], BCount, WCount, BCount, WCount).
 
+% count_board_pieces(+Board, +BCount, +WCount, -BCountOut, -WCountOut)
 count_board_pieces([Row|Rest], BCountIn, WCountIn, BCountOut, WCountOut) :-
     count_board_pieces(Row, BCountIn, WCountIn, BCountMid, WCountMid),
     count_board_pieces(Rest, BCountMid, WCountMid, BCountOut, WCountOut).
 
+% count_board_pieces(+Row, +BCount, +WCount, -BCountOut, -WCountOut), counts the number of black pieces on the board, incrementing BcountOut
 count_board_pieces([board_piece(_, _, 'B', _, _)|Rest], BCountIn, WCountIn, BCountOut, WCountOut) :-
     BCountMid is BCountIn + 1,
     count_board_pieces(Rest, BCountMid, WCountIn, BCountOut, WCountOut).
 
+% count_board_pieces(+Row, +BCount, +WCount, -BCountOut, -WCountOut), counts the number of white pieces on the board, incrementing WcountOut
 count_board_pieces([board_piece(_, _, 'W', _, _)|Rest], BCountIn, WCountIn, BCountOut, WCountOut) :-
     WCountMid is WCountIn + 1,
     count_board_pieces(Rest, BCountIn, WCountMid, BCountOut, WCountOut).

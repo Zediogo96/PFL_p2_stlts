@@ -1,14 +1,20 @@
 % get_board_piece(+GameState, +RowNum, +ColumnNum, -BoardPiece)
 get_board_piece(RowNum, ColumnNum, BoardPiece) :-
+    % get the board from the game state
     current_board(Board),
+    % adjust the row number to be in the range 1 to 8
     RowNum1 is 13 - RowNum,
+    % get the row at the specified index
     nth1(RowNum1, Board, Row),
+    % get the board piece at the specified column in the row
     nth1(ColumnNum, Row, BoardPiece).
 
 get_board_piece_(RowNum, ColumnNum, BoardPiece) :-
     current_board(Board),
     RowNum1 is 13 - RowNum,
+    % get the row at the specified index
     nth1(RowNum1, Board, Row),
+    % get the board piece at the specified column in the row
     nth1(ColumnNum, Row, BoardPiece).
 
 % replace_board_piece(+RowNum, +ColumnNum, +NewBoardPiece)
@@ -30,13 +36,17 @@ replace_board_piece(RowNum, ColumnNum, NewBoardPiece) :-
 replace_at_index(List, Index, Value, NewList) :-
     Index1 is Index - 1,
     length(Before, Index1),
+    % split the list into two parts
     append(Before, [_|After], List),
+    % replace the element at the specified index
     append(Before, [Value|After], NewList).
 
 % move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
 move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
-    validate_movement_inputs(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum), % combines validate_indices/4 and validate_not_diagonal/4
-    once(move_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)). % use once/1 to prevent backtracking
+    % combines validate_indices/4 and validate_not_diagonal/4
+    validate_movement_inputs(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
+    % use once/1 to prevent backtracking 
+    once(move_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)). 
 
 
 %validate_move(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
@@ -49,25 +59,28 @@ validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
     ->  check_row_range(FromRowNum, ToRowNum, FromColumnNum),
         check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
         has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)
-        
     ).
 
 % move_aux(+FromRowNum, +FromColumnNum, +ToRowNum, +ToColumnNum)
 move_aux(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
-    get_board_piece(FromRowNum, FromColumnNum, BoardPiece), % get the board piece at the starting position
+    % get the board piece at the starting position
+    get_board_piece(FromRowNum, FromColumnNum, BoardPiece),
     % extract board piece information
     BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
     validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum),
-    replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), % remove the board piece at the starting position
-    replace_board_piece(ToRowNum, ToColumnNum, board_piece(ToRowNum, ToColumnNum, Type, NumWhitePins, NumBlackPins)). % place the board piece at the ending position
+    % remove the board piece at the starting position
+    replace_board_piece(FromRowNum, FromColumnNum, board_piece(FromRowNum, FromColumnNum, ' ', 0, 0)), 
+    % place the board piece at the ending positio
+    replace_board_piece(ToRowNum, ToColumnNum, board_piece(ToRowNum, ToColumnNum, Type, NumWhitePins, NumBlackPins)).
 
 % valid_moves(+FromRowNum, +FromColumnNum, -MoveDestinations)
 valid_moves(FromRowNum, FromColumnNum, MoveDestinations) :-
     % generate all possible ToRowNum and ToColumnNum coordinates
-    findall((ToRowNum, ToColumnNum), (member(ToRowNum, [0,1,2,3,4,5,6,7,8,9,10,11]), member(ToColumnNum, [0,1,2,3,4,5,6,7,8,9,10,11]), validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)), MoveDestinations).
+    findall((ToRowNum, ToColumnNum), (member(ToRowNum, [1,2,3,4,5,6,7,8,9,10,11,12]), member(ToColumnNum, [1,2,3,4,5,6,7,8,9,10,11,12]), validate_move(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum)), MoveDestinations).
 
 % ------------------------ UPDATE PINS -----------------------------
 
+% increment_white_pin(+RowNum, +ColumnNum), allows the player to increment the number of white pins on a board piece
 increment_white_pin(RowNum, ColumnNum) :-
     get_board_piece(RowNum, ColumnNum, BoardPiece),
     BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
@@ -75,6 +88,7 @@ increment_white_pin(RowNum, ColumnNum) :-
     NewNumWhitePins is NumWhitePins + 1,
     replace_board_piece(RowNum, ColumnNum, board_piece(RowNum, ColumnNum, Type, NewNumWhitePins, NumBlackPins)).
 
+% increment_black_pin(+RowNum, +ColumnNum), allows the player to increment the number of black pins on a board piece
 increment_black_pin(RowNum, ColumnNum) :-
     get_board_piece(RowNum, ColumnNum, BoardPiece),
     BoardPiece = board_piece(_, _, Type, NumWhitePins, NumBlackPins),
@@ -122,11 +136,10 @@ is_column_range_clear_greater(StartColumn, EndColumn, Row) :-
 
 % check_row_range(+StartRow, +EndRow, +Column)
 check_row_range(StartRow, EndRow, Column) :-
-    SR is 13 - StartRow, ER is 13 - EndRow, % flip the rows so they are in ascending order
-    (   SR < ER
-    ->  is_row_range_clear_smaller(SR, ER, Column)
-    ;   SR > ER,
-        is_row_range_clear_greater(SR, ER, Column)
+    (   StartRow < EndRow
+    -> is_row_range_clear_smaller(StartRow, EndRow, Column)
+    ; 
+       is_row_range_clear_greater(StartRow, EndRow, Column)
     ).
 
 % is_row_range_clear_smaller(+StartRow, +EndRow, +Column)
@@ -149,7 +162,7 @@ is_row_range_clear_greater(StartRow, EndRow, Column) :-
     (   StartRow =:= Stop
     ->  true
     ;   StartRow1 is StartRow - 1,
-        get_board_piece(StartRow1, Column, BoardElement), % use get_board_piece/3 instead of board_element/3
+        get_board_piece(StartRow1, Column, BoardElement), 
         (   BoardElement = board_piece(_, _, ' ', _, _)
         ->  is_row_range_clear_greater(StartRow1, EndRow, Column)
         ;   /* write('Error: encountered a non-empty board piece in row range'), nl, */
@@ -172,10 +185,12 @@ check_same_type(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
 
 % ------------------------ VALIDATE MOVE ------------------------
 
+% validate_move(+StartRow, +StartColumn, +EndRow, +EndColumn). wrapper functin to validate moves
 validate_movement_inputs(StartRow, StartColumn, EndRow, EndColumn) :-
     validate_indices(StartRow, StartColumn, EndRow, EndColumn),
     validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn).
 
+% validate_not_diagonal(+StartRow, +StartColumn, +EndRow, +EndColumn)
 validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
     (StartRow = EndRow, StartColumn = EndColumn ->
      write('Error: start position and end position are the same. Move must be to a different position.'), nl,
@@ -186,6 +201,7 @@ validate_not_diagonal(StartRow, StartColumn, EndRow, EndColumn) :-
      /* write('Error: move cannot be diagonal.'), nl, */
      fail).
 
+% validate_indices(+StartRow, +StartColumn, +EndRow, +EndColumn)
 validate_indices(StartRow, StartColumn, EndRow, EndColumn) :-
     is_between(1, 12, StartRow),
     is_between(1, 12, StartColumn),
@@ -234,7 +250,6 @@ game_over(Winner, Mode) :-
     % count the number of board pieces with type 'B' and type 'W' in the board
     count_board_pieces(Board, 0, 0, BCount, WCount),
     % check if either player has no more board pieces
-
     (Mode == 'PvP' ->
      (   BCount == 0
      ->  Winner = 'Player1'

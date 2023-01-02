@@ -10,5 +10,5 @@
 :- reconsult('utils.pl').
 :- reconsult('bot.pl').
 
-
+% Main predicate
 play :- menu.

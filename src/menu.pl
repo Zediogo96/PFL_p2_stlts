@@ -1,15 +1,20 @@
+% play_pvp/0, predicate to start the game in player vs player mode
 play_pvp :-
     initial_state(GameState-Player),
     game_loop(GameState-Player).
 
+% play_bot_easy/0, predicate to start the game in player vs bot easy mode
 play_bot_easy :-
     initial_state(GameState-Player),
     game_loop_bot(GameState-Player, easy).
 
+% plat_bot_hard/0, predicate to start the game in player vs bot hard mode
 play_bot_hard :-
     initial_state(GameState-Player),
     game_loop_bot(GameState-Player, hard).
 
+% game loop for the player vs player mode, it will loop asking in turn based fashion for the players to make a move, until any game over condition is met
+% game_loop(+GameState-Player)
 game_loop(GameState-Player) :-
     
     repeat,
@@ -19,6 +24,7 @@ game_loop(GameState-Player) :-
      display_game(GameState-Player), nl,
      nl,nl,nl,
      write('Game Over! Winner: '), write(Winner), nl,
+     % resets the board to it's initial state
      revert_board,
      call(menu)
      ;
@@ -30,6 +36,7 @@ game_loop(GameState-Player) :-
      game_loop(GameState-NextPlayer)
     ).  
 
+% game loop for the player vs bot mode, it will loop asking the play to make a valid move, and then the bot makes a move, until any game over condition is met
 game_loop_bot(GameState-Player, Level) :-
     
     repeat,
@@ -59,6 +66,7 @@ game_loop_bot(GameState-Player, Level) :-
             (Level = easy -> game_loop_bot(GameState-NextPlayer, easy); game_loop_bot(GameState-NextPlayer, hard))
     ).
 
+%  instructions/0, predicate to display the instructions of the game
 instructions :-
     write(' _____________________________________________________________'), nl,
     write('|                     Stlts - Board Game                      |'), nl,
@@ -88,6 +96,7 @@ instructions :-
 
     call(menu).
 
+% quit/0, quits the game.
 quit :-
     nl.
 
@@ -104,6 +113,7 @@ write('*        @@    @@     @@       @@           @@   *'),nl,
 write('*  @@@@@@@@    @@     @@@@@@@  @@     @@@@@@@@   *'),nl,
 write('**************************************************'),nl,nl.
 
+% menu/0, predicate to display the menu and call the selected option
 menu :-
     repeat,
     nl,
@@ -117,6 +127,7 @@ menu :-
     nl,
     call(OptionName).
 
+% write_menu_list/0, predicate to write the menu list
 write_menu_list :-
     menu_option(N, Name),
     write(N), write('. '), write(Name), nl,
@@ -213,17 +224,20 @@ get_valid_row_column_input(Row, Column) :-
      write('Error: invalid row index. Row index must be between 1 and 12.'), nl,
      fail).
 
-% print_valid_move_destinations(+ValidDestinations)
+% print_valid_move_destinations(+ValidDestinations), predicate to print the valid move destinations to the player choosing a move
 print_valid_move_destinations(ValidDestinations) :-
     length(ValidDestinations, NumValidDestinations), nl,
+    % if there are no valid moves available for that piece, print an error message and fail
     (NumValidDestinations =:= 0 -> 
     write('There are no valid destinations for this piece.'), nl, fail;
+    % otherwise, print the valid destinations
     format('There are ~w valid destinations for this piece:\n', [NumValidDestinations]), nl,
     helper_print_valid_moves(ValidDestinations, 1)).
 
 % print_valid_move_destinations(+ValidDestinations, +Num)
 helper_print_valid_moves([], _).
 helper_print_valid_moves([(ToRowNum, ToColumnNum)|ValidDestinations], Num) :-
+    % to conver the column number to a letter
     int_to_char(ToColumnNum, ToColumnChar),
     format('~w. (~w, ~w)\n', [Num, ToRowNum, ToColumnChar]),
     Num1 is Num + 1,

@@ -1,24 +1,29 @@
 % select_random_black_piece(-RowNum, -ColNum)
 select_random_black_piece(RowNum, ColNum) :-
+    % Find all black pieces on the board and store their coordinates in BlackPieces.
     findall(Row-Col, (member(Row, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Col, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(Row, Col, board_piece(_, _, 'B', _, _))), BlackPieces),
     length(BlackPieces, NumBlackPieces),
     random(1, NumBlackPieces, RandomIndex),
+    % Find the RandomIndex-th element of BlackPieces and unify it with RowNum-ColNum.
     nth1(RandomIndex, BlackPieces, RowNum-ColNum).
 
+% get_random_destination(+MoveDestinations, -TR, -TC)
 get_random_destination(MoveDestinations, TR, TC) :-
+    % Find the number of elements in the list of destinations.
     length(MoveDestinations, NumDestinations),
     random(0, NumDestinations, Index),
+    % Find the Index-th element of MoveDestinations and unify it with RandomDestination.
     nth0(Index, MoveDestinations, RandomDestination),
+    % Unify TR and TC with the coordinates of RandomDestination.
     (TR, TC) = RandomDestination.
 
 % manage_piece(-Piece)
 manage_piece_bot_easy(Piece) :-
-
     % Select a random black piece
     select_random_black_piece(Row, Column),
-
+    % Get it's valids moves
     valid_moves(Row, Column, MoveDestinations),
-
+    % If it has valid moves, move it to a random valid destination, otherwise add a random pin
     length(MoveDestinations, NumValidDestinations),
         (NumValidDestinations > 0 -> 
         get_random_destination(MoveDestinations, TR, TC),
@@ -32,17 +37,13 @@ manage_piece_bot_hard(Piece) :-
 
     % Select the black piece that is closest to a white piece
     closest_black_piece(BlackRow, BlackColumn, WhiteRow, WhiteCol),
-
     %get the corresponding black piece
     get_board_piece(BlackRow, BlackColumn, Piece),
-
     % Calculate vertical and horizaontal distances to black piece (to check which pin should be added if no moves are possible)
     Vdis is abs(BlackRow-WhiteRow),
     Hdis is abs(BlackColumn-WhiteCol),
-    
     % Get valid move destinations for the selected black piece
     valid_moves(BlackRow, BlackColumn, MoveDestinations),
-
     (
         (BlackRow == WhiteRow, BlackColumn \= WhiteCol)->
         (member((WhiteRow,WhiteCol), MoveDestinations) -> 
@@ -88,13 +89,13 @@ distance_to_white_piece(RowNum, ColNum,  Distance) :-
 % distance(+RowNum, +ColNum, +WhitePiece, -Distance)
 distance(RowNum, ColNum, X-Y, X-Y-Distance) :-
     % write('White Piece at: '), write(X), write('-'), write(Y), write(' '), write('Distance: '),
-    Distance is max(abs(RowNum-X), abs(ColNum-Y)).
+    Distance is max(abs(RowNum-X), abs(ColNum-Y) + 0.01).
 
 % sort_list_by_dist(+List, -SortedList)
 sort_list_by_dist(List, SortedList) :-
     sort_list_by_dist(List, [], SortedList).
 
-% sort_list_by_dist(+List, +Acc, -SortedList)
+% sort_list_by_dist(+List, +Acc, -SortedList), sorts the list by distance in ascending order
 sort_list_by_dist([], Acc, Acc).
 sort_list_by_dist([X-Y-Dist|T], Acc, SortedList) :-
     insert_sorted(X-Y-Dist, Acc, Acc1),
