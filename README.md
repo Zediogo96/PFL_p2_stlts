@@ -39,11 +39,10 @@ More information [here](https://boardgamegeek.com/boardgame/16237/stlts).
 
 ## How to play
 
-In this digital version of the game, there are 3 game modes:
+In this digital version of the game, there the following game modes:
 
 - Player x Player - Players take turns to try and beat each other.
 - Player x Bot - The player faces a bot that can play the game by choosing random moves (difficulty level 1) or the best move at the moment, using a greedy algorithm (difficulty level 2).
-- Bot x Bot - The bot plays against itself, with the same difficulty levels as the previous mode.
 
 ## Game logic
 
@@ -198,4 +197,4 @@ Developing a game in Prolog was a highly educational and enriching experience. I
 - [igGameCenter](https://www.iggamecenter.com/en/rules/stlts)
 - [Board Game Geek](https://boardgamegeek.com/boardgame/16237/stlts)
 - [YouTube - Mango Town Plays](https://www.youtube.com/watch?v=mEaDUg-L7aE)
-- [SicTus Prolog 4](https://sicstus.sics.se/)
+- [SicsTus Prolog 4](https://sicstus.sics.se/)
