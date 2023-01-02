@@ -36,7 +36,7 @@ manage_piece_bot_easy(Piece) :-
 manage_piece_bot_hard(TypePlay) :-
 
     % Select the black piece that is closest to a white piece
-    closest_black_piece(TypePlay, CurrRow, CurrColumn, TargetRow, TargetCol),
+    bot_choose_closest_piece(TypePlay, CurrRow, CurrColumn, TargetRow, TargetCol),
     %get the corresponding black piece
     get_board_piece(CurrRow, CurrColumn, Piece),
     % Calculate vertical and horizaontal distances to black piece (to check which pin should be added if no moves are possible)
@@ -64,9 +64,9 @@ manage_piece_bot_hard(TypePlay) :-
         (member((CurrRow, TargetCol), MoveDestinations) -> move(CurrRow, CurrColumn, CurrRow, TargetCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [CurrRow, CurrColumn, CurrRow, TargetCol]), nl; increment_black_pin(CurrRow, CurrColumn), nl, format('Bot added black pin to piece in (~w,~w)', [CurrRow, CurrColumn]), nl))
     ).
 
-% closest_black_piece(+TypePlay, -RowNum, -ColNum, -TargetRow, -TargetCol)
-closest_black_piece(TypePlay, RowNum, ColNum, TargetRow, TargetCol) :-
-    findall((X-Y-Dist), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]),get_board_piece(X, Y, board_piece(X, Y, TypePlay, _, _)), distance_to_white_piece(TypePlay, X, Y, Dist)), L),
+% bot_choose_closest_piece(+TypePlay, -RowNum, -ColNum, -TargetRow, -TargetCol)
+bot_choose_closest_piece(TypePlay, RowNum, ColNum, TargetRow, TargetCol) :-
+    findall((X-Y-Dist), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]),get_board_piece(X, Y, board_piece(X, Y, TypePlay, _, _)), distance_to_other_piece_type(TypePlay, X, Y, Dist)), L),
     sort_list_by_dist(L, SortedList),
     reverse(SortedList, ReversedList),
     nth1(1, ReversedList, (RowNum-ColNum-Other)),
@@ -74,8 +74,8 @@ closest_black_piece(TypePlay, RowNum, ColNum, TargetRow, TargetCol) :-
     arg(1, Temp, TargetRow), arg(2, Temp, TargetCol),
     arg(2, Other, D).
 
-% distance_to_white_piece(+RowNum, +ColNum, -Distance)
-distance_to_white_piece(TypePlay, RowNum, ColNum,  Distance) :-
+% distance_to_other_piece_type(+RowNum, +ColNum, -Distance)
+distance_to_other_piece_type(TypePlay, RowNum, ColNum,  Distance) :-
     % if typePlay is 'B', set typeTarget to 'W', otherwise set it to 'B'
     (TypePlay = 'B' -> TypeTarget = 'W'; TypeTarget = 'B'),
     % write('Black Piece at: '), write(RowNum), write('-'), write(ColNum), nl,
