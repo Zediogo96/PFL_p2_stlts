@@ -33,54 +33,54 @@ manage_piece_bot_easy(Piece) :-
         ).
 
 % manage_piece_boat_hard(-Piece)
-manage_piece_bot_hard(Piece) :-
+manage_piece_bot_hard(TypePlay) :-
 
     % Select the black piece that is closest to a white piece
-    closest_black_piece(BlackRow, BlackColumn, WhiteRow, WhiteCol),
+    closest_black_piece(TypePlay, CurrRow, CurrColumn, TargetRow, TargetCol),
     %get the corresponding black piece
-    get_board_piece(BlackRow, BlackColumn, Piece),
+    get_board_piece(CurrRow, CurrColumn, Piece),
     % Calculate vertical and horizaontal distances to black piece (to check which pin should be added if no moves are possible)
-    Vdis is abs(BlackRow-WhiteRow),
-    Hdis is abs(BlackColumn-WhiteCol),
+    Vdis is abs(CurrRow-TargetRow),
+    Hdis is abs(CurrColumn-TargetCol),
     % Get valid move destinations for the selected black piece
-    valid_moves(BlackRow, BlackColumn, MoveDestinations),
+    valid_moves(CurrRow, CurrColumn, MoveDestinations),
     (
-        (BlackRow == WhiteRow, BlackColumn \= WhiteCol)->
-        (member((WhiteRow,WhiteCol), MoveDestinations) -> 
-        move(BlackRow, BlackColumn, WhiteRow, WhiteCol), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, WhiteRow, WhiteCol]), nl;
-        increment_black_pin(BlackRow, BlackColumn), nl, format('Bot added black pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl
+        (CurrRow == TargetRow, CurrColumn \= TargetCol)->
+        (member((TargetRow,TargetCol), MoveDestinations) -> 
+        move(CurrRow, CurrColumn, TargetRow, TargetCol), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [CurrRow, CurrColumn, TargetRow, TargetCol]), nl;
+        increment_black_pin(CurrRow, CurrColumn), nl, format('Bot added black pin to piece in (~w,~w)', [CurrRow, CurrColumn]), nl
         )
         ;
-        (BlackRow \= WhiteRow, BlackColumn == WhiteCol) ->
-        (member((WhiteRow,WhiteCol), MoveDestinations) -> 
-        move(BlackRow, BlackColumn, WhiteRow, WhiteCol), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, WhiteRow, WhiteCol]), nl;
-        increment_white_pin(BlackRow, BlackColumn), nl, format('Bot added white pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl
+        (CurrRow \= TargetRow, CurrColumn == TargetCol) ->
+        (member((TargetRow,TargetCol), MoveDestinations) -> 
+        move(CurrRow, CurrColumn, TargetRow, TargetCol), nl, format('Bot moved piece from (~w,~w) to (~w,~w)', [CurrRow, CurrColumn, TargetRow, TargetCol]), nl;
+        increment_white_pin(CurrRow, CurrColumn), nl, format('Bot added white pin to piece in (~w,~w)', [CurrRow, CurrColumn]), nl
         )
         ;
-        (BlackRow \= WhiteRow, BlackColumn \= WhiteCol) ->
+        (CurrRow \= TargetRow, CurrColumn \= TargetCol) ->
         %check if Hdis is greater or equal than Vdis 
         (Hdis >= Vdis -> 
-        (member((WhiteRow, BlackCol), MoveDestinations) -> move(BlackRow, BlackColumn, WhiteRow, BlackCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, WhiteRow, BlackCol]), nl; increment_white_pin(BlackRow, BlackColumn), nl, format('Bot added white pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl); 
-        (member((BlackRow, WhiteCol), MoveDestinations) -> move(BlackRow, BlackColumn, BlackRow, WhiteCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [BlackRow, BlackColumn, BlackRow, WhiteCol]), nl; increment_black_pin(BlackRow, BlackColumn), nl, format('Bot added black pin to piece in (~w,~w)', [BlackRow, BlackColumn]), nl))
+        (member((TargetRow, CurrCol), MoveDestinations) -> move(CurrRow, CurrColumn, TargetRow, CurrCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [CurrRow, CurrColumn, TargetRow, CurrCol]), nl; increment_white_pin(CurrRow, CurrColumn), nl, format('Bot added white pin to piece in (~w,~w)', [CurrRow, CurrColumn]), nl); 
+        (member((CurrRow, TargetCol), MoveDestinations) -> move(CurrRow, CurrColumn, CurrRow, TargetCol), format('Bot moved piece from (~w,~w) to (~w,~w)', [CurrRow, CurrColumn, CurrRow, TargetCol]), nl; increment_black_pin(CurrRow, CurrColumn), nl, format('Bot added black pin to piece in (~w,~w)', [CurrRow, CurrColumn]), nl))
     ).
 
-% closest_black_piece(-RowNum, -ColNum)
-closest_black_piece(RowNum, ColNum, WhiteRow, WhiteCol) :-
-    findall((X-Y-Dist), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]),get_board_piece(X, Y, board_piece(X, Y, 'B', _, _)), distance_to_white_piece(X, Y, Dist)), L),
+% closest_black_piece(+TypePlay, -RowNum, -ColNum, -TargetRow, -TargetCol)
+closest_black_piece(TypePlay, RowNum, ColNum, TargetRow, TargetCol) :-
+    findall((X-Y-Dist), (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]),get_board_piece(X, Y, board_piece(X, Y, TypePlay, _, _)), distance_to_white_piece(TypePlay, X, Y, Dist)), L),
     sort_list_by_dist(L, SortedList),
     reverse(SortedList, ReversedList),
     nth1(1, ReversedList, (RowNum-ColNum-Other)),
     arg(1, Other, Temp),
-    arg(1, Temp, WhiteRow), arg(2, Temp, WhiteCol),
+    arg(1, Temp, TargetRow), arg(2, Temp, TargetCol),
     arg(2, Other, D).
-    % write('White Piece is: '), write(WhiteRow), write('-'), write(WhiteCol), nl,
-    % write('Distance is: '), write(D), nl.
 
 % distance_to_white_piece(+RowNum, +ColNum, -Distance)
-distance_to_white_piece(RowNum, ColNum,  Distance) :-
+distance_to_white_piece(TypePlay, RowNum, ColNum,  Distance) :-
+    % if typePlay is 'B', set typeTarget to 'W', otherwise set it to 'B'
+    (TypePlay = 'B' -> TypeTarget = 'W'; TypeTarget = 'B'),
     % write('Black Piece at: '), write(RowNum), write('-'), write(ColNum), nl,
-    findall(X-Y, (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(X, Y, board_piece(X, Y, 'W', _, _))), WhitePieces),
-    maplist(distance(RowNum, ColNum), WhitePieces, Distances),
+    findall(X-Y, (member(X, [1,2,3,4,5,6,7,8,9,10,11,12]), member(Y, [1,2,3,4,5,6,7,8,9,10,11,12]), get_board_piece(X, Y, board_piece(X, Y, TypeTarget, _, _))), Pieces),
+    maplist(distance(RowNum, ColNum), Pieces, Distances),
     % sort the list of distances in ascending order
     sort_list_by_dist(Distances, SortedList),
     % get the first element of the sorted list

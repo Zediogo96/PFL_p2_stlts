@@ -245,24 +245,33 @@ has_enough_pins(FromRowNum, FromColumnNum, ToRowNum, ToColumnNum) :-
 % ------------------------ END BOUNDARIES CHECK ------------------------
 
 % game_over(+Board, +Player, -Winner)
+% game_over(+Board, +Player, -Winner)
 game_over(Winner, Mode) :-
-    current_board(Board),
-    % count the number of board pieces with type 'B' and type 'W' in the board
-    count_board_pieces(Board, 0, 0, BCount, WCount),
-    % check if either player has no more board pieces
+current_board(Board),
+% count the number of board pieces with type 'B' and type 'W' in the board
+count_board_pieces(Board, 0, 0, BCount, WCount),
+% check if either player has no more board pieces
     (Mode == 'PvP' ->
-     (   BCount == 0
-     ->  Winner = 'Player1'
-     ;   WCount == 0
-     ->  Winner = 'Player2'
-     ;   Winner = 'None'
-     )
+        ( BCount == 0
+        -> Winner = 'Player1'
+        ; WCount == 0
+        -> Winner = 'Player2'
+        ; Winner = 'None'
+    )
     ;
     Mode == 'PvE' ->
-     (   BCount == 0   
-        ->  Winner = 'Player1'
-        ;   WCount == 0
-        ->  Winner = 'Bot'
-        ;   Winner = 'None'
-        )
-    ).
+        ( BCount == 0
+        -> Winner = 'Player1'
+        ; WCount == 0
+        -> Winner = 'Bot'
+        ; Winner = 'None'
+    )
+    ;
+        Mode == 'BvB' ->
+        ( BCount == 0
+        -> Winner = 'Bot1'
+        ; WCount == 0
+        -> Winner = 'Bot2'
+        ; Winner = 'None'
+    )
+).

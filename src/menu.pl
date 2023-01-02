@@ -13,6 +13,11 @@ play_bot_hard :-
     initial_state(GameState-Player),
     game_loop_bot(GameState-Player, hard).
 
+% play_bot_vs_bot/0, predicate to start the game in bot vs bot mode
+bot_vs_bot :-
+    initial_state(GameState-Player),
+    game_loop_bot_vs_bot(GameState-bot1).
+
 % game loop for the player vs player mode, it will loop asking in turn based fashion for the players to make a move, until any game over condition is met
 % game_loop(+GameState-Player)
 game_loop(GameState-Player) :-
@@ -60,10 +65,40 @@ game_loop_bot(GameState-Player, Level) :-
         (Player = bot ->
             % game is not over, display the current game state and allow the player to make a move
             %display_game(GameState-Player), nl,
-            (Level = easy -> manage_piece_bot_easy(Piece); manage_piece_bot_hard(Piece)),
+            (Level = easy -> manage_piece_bot_easy(Piece); manage_piece_bot_hard('W')),
             % set player to the next player
             (Player = bot -> NextPlayer = player1; NextPlayer = bot)),
             (Level = easy -> game_loop_bot(GameState-NextPlayer, easy); game_loop_bot(GameState-NextPlayer, hard))
+    ).
+
+game_loop_bot_vs_bot(GameState-Player) :-
+    
+    repeat,
+    game_over(Winner, 'BvB'),
+    sleep(2),
+
+    (Winner \= 'None' ->
+     % game is over, display the final game state and stop looping
+     nl,nl,nl,
+     write('Game Over! Winner: '), write(Winner), nl,
+     revert_board,
+     call(menu)
+     ;
+        % if player=bot1
+        (Player = bot1 ->
+            % game is not over, display the current game state and allow the player to make a move
+            display_game(GameState-Player), nl,
+            manage_piece_bot_hard('W'),
+            % set player to the next player
+            NextPlayer = bot2),
+            game_loop_bot_vs_bot(GameState-NextPlayer);
+        % if player=bot2
+        (Player = bot2 ->
+            display_game(GameState-Player), nl,
+            manage_piece_bot_hard('B'),
+            % set player to the next player
+            NextPlayer = bot1),
+            game_loop_bot_vs_bot(GameState-NextPlayer)
     ).
 
 %  instructions/0, predicate to display the instructions of the game
@@ -138,8 +173,9 @@ write_menu_list.
 menu_option(1, play_pvp).
 menu_option(2, play_bot_easy).
 menu_option(3, play_bot_hard).
-menu_option(3, instructions).
-menu_option(4, quit).
+menu_option(4, bot_vs_bot).
+menu_option(5, instructions).
+menu_option(6, quit).
 
 % manage_piece(-Piece)
 manage_piece(Piece, Player) :-
