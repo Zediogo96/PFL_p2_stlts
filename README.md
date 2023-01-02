@@ -43,6 +43,7 @@ In this digital version of the game, there the following game modes:
 
 - Player x Player - Players take turns to try and beat each other.
 - Player x Bot - The player faces a bot that can play the game by choosing random moves (difficulty level 1) or the best move at the moment, using a greedy algorithm (difficulty level 2).
+- Bot x Bot - In this mode, the player may watch a demonstration of the game, while it is played by the computer against itself (two bots in difficulty level 2, making "intelligent" moves).
 
 ## Game logic
 
@@ -166,7 +167,7 @@ The predicate which allows this bot to make a choice is called `manage_piece_bot
 
 The predicate which allows this bot to make a choice is called `manage_piece_bot_hard(-Piece)`. It uses a variety of other predicates, which are described in order below.
 
-- `closest_black_piece(-BlackRow, -BlackColumn, -WhiteRow, -WhiteCol)` - selects the coordinates of the black piece that is closest to a white piece and returns the coordinates of the two pieces that are close to each other in BlackRow, BlackColumn, WhiteRow, WhiteCol
+- `bot_choose_closest_piece(+TypePlay, -RowNum, -ColNum, -TargetRow, -TargetCol)` - selects the coordinates of the piece of the chosen type that is closest to a piece of the other type and returns the coordinates of the two pieces that are close to each other in RowNum, ColNum, TargetRow, TargetCol. Uses the predicate `distance_to_other_piece_type(+TypePlay, +RowNum, +ColNum, -Distance` to calculate the distance to the target piece.
 
 - `get_board_piece(+RowNum, +ColNum, -Piece)` - gets the closest black piece representation (with pins, etc.) in the board at the given coordinates
 
