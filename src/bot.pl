@@ -32,7 +32,7 @@ manage_piece_bot_easy(Piece) :-
         (Random = 0 -> increment_white_pin(Row,Column), nl, format('Bot added white pin to piece in (~w,~w)', [Row, Column]), nl; increment_black_pin(Row,Column), nl, format('Bot added black pin to piece in (~w,~w)', [Row, Column]), nl)
         ).
 
-% manage_piece_boat_hard(-Piece)
+% manage_piece_boat_hard(+TypePlay)
 manage_piece_bot_hard(TypePlay) :-
 
     % Select the black piece that is closest to a white piece
@@ -74,7 +74,7 @@ bot_choose_closest_piece(TypePlay, RowNum, ColNum, TargetRow, TargetCol) :-
     arg(1, Temp, TargetRow), arg(2, Temp, TargetCol),
     arg(2, Other, D).
 
-% distance_to_other_piece_type(+RowNum, +ColNum, -Distance)
+% distance_to_other_piece_type(+Typeplay, +RowNum, +ColNum, -Distance)
 distance_to_other_piece_type(TypePlay, RowNum, ColNum,  Distance) :-
     % if typePlay is 'B', set typeTarget to 'W', otherwise set it to 'B'
     (TypePlay = 'B' -> TypeTarget = 'W'; TypeTarget = 'B'),
